@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This file is part of REANA.
 # Copyright (C) 2017 CERN.
 #
@@ -20,17 +18,12 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-from __future__ import absolute_import
-from celery import Celery
-
-app = Celery('tasks',
-             broker='amqp://test:1234@'
-                    'message-broker.default.svc.cluster.local//',
-             include=['worker.tasks'])
-
-
-app.conf.update(CELERY_ACCEPT_CONTENT=['json'],
-                CELERY_TASK_SERIALIZER='json')
-
-if __name__ == '__main__':
-    app.start()
+include Dockerfile
+include COPYING
+include *.rst
+include *.sh
+include pytest.ini
+recursive-include docs *.py
+recursive-include docs *.png
+recursive-include docs *.rst
+recursive-include tests *.py

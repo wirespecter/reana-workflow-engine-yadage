@@ -20,17 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-from __future__ import absolute_import
-from celery import Celery
+"""Pytest configuration for REANA-Workflow-Engine-Yadage."""
 
-app = Celery('tasks',
-             broker='amqp://test:1234@'
-                    'message-broker.default.svc.cluster.local//',
-             include=['worker.tasks'])
+from __future__ import absolute_import, print_function
 
-
-app.conf.update(CELERY_ACCEPT_CONTENT=['json'],
-                CELERY_TASK_SERIALIZER='json')
-
-if __name__ == '__main__':
-    app.start()
+import pytest
