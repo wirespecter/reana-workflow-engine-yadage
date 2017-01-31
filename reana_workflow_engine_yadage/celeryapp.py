@@ -26,7 +26,7 @@ from celery import Celery
 app = Celery('tasks',
              broker='amqp://test:1234@'
                     'message-broker.default.svc.cluster.local//',
-             include=['worker.tasks'])
+             include=['reana_workflow_engine_yadage.tasks'])
 
 
 app.conf.update(CELERY_ACCEPT_CONTENT=['json'],

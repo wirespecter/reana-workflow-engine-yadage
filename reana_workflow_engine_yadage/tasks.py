@@ -25,11 +25,11 @@ from __future__ import absolute_import, print_function
 import logging
 import os
 
-import worker.celery_zeromq
+import reana_workflow_engine_yadage.celery_zeromq
 import zmq
 
-from worker.celeryapp import app
-from worker.zeromq_tracker import ZeroMQTracker
+from reana_workflow_engine_yadage.celeryapp import app
+from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 from yadage.clihelpers import setupbackend_fromstring
 from yadage.steering_api import steering_ctx
 
@@ -40,7 +40,7 @@ API_VERSION = 'api/v1.0'
 def run_yadage_workflow_standalone(jobguid, ctx):
     log.info('getting socket..')
 
-    zmqctx = worker.celery_zeromq.get_context()
+    zmqctx = reana_workflow_engine_yadage.celery_zeromq.get_context()
     socket = zmqctx.socket(zmq.PUB)
     socket.connect(os.environ['ZMQ_PROXY_CONNECT'])
 
