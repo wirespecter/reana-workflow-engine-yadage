@@ -24,7 +24,6 @@ import json
 import logging
 import requests
 
-API_VERSION = 'api/v1.0'
 JOBCONTROLLER_HOST = 'job-controller.default.svc.cluster.local'
 
 log = logging.getLogger('yadage.cap.submit')
@@ -41,9 +40,8 @@ def submit(experiment, image, cmd):
     log.info('submitting %s', json.dumps(job_spec, indent=4, sort_keys=True))
 
     response = requests.post(
-        'http://{host}/{api}/{resource}'.format(
+        'http://{host}/{resource}'.format(
             host=JOBCONTROLLER_HOST,
-            api=API_VERSION,
             resource='jobs'
         ),
         json=job_spec,
@@ -56,9 +54,8 @@ def submit(experiment, image, cmd):
 
 def check_status(job_id):
     response = requests.get(
-        'http://{host}/{api}/{resource}/{id}'.format(
+        'http://{host}/{resource}/{id}'.format(
             host=JOBCONTROLLER_HOST,
-            api=API_VERSION,
             resource='jobs',
             id=job_id
         ),
