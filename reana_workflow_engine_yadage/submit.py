@@ -64,3 +64,16 @@ def check_status(job_id):
 
     job_info = response.json()['job']
     return job_info
+
+
+def get_logs(job_id):
+    response = requests.get(
+        'http://{host}/{resource}/{id}/logs'.format(
+            host=JOBCONTROLLER_HOST,
+            resource='jobs',
+            id=job_id
+        ),
+        headers={'cache-control': 'no-cache'}
+    )
+
+    return response.text
