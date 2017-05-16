@@ -32,9 +32,9 @@ log = logging.getLogger('yadage.cap.submit')
 def submit(experiment, image, cmd):
     job_spec = {
         'experiment': experiment,
-        'docker-img': image,
+        'docker_img': image,
         'cmd': cmd,
-        'env-vars': {}
+        'env_vars': {}
     }
 
     log.info('submitting %s', json.dumps(job_spec, indent=4, sort_keys=True))
@@ -48,7 +48,7 @@ def submit(experiment, image, cmd):
         headers={'content-type': 'application/json'}
     )
 
-    job_id = str(response.json()['job-id'])
+    job_id = str(response.json()['job_id'])
     return job_id
 
 
