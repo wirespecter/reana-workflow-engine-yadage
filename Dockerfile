@@ -18,19 +18,16 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-FROM fedora
-RUN dnf install -y gcc gcc-c++ graphviz-devel ImageMagick python-devel libffi-devel openssl openssl-devel unzip nano autoconf automake libtool
-RUN dnf install -y dnf redhat-rpm-config
-RUN curl https://bootstrap.pypa.io/get-pip.py | python -
-RUN pip install celery==3.1.17
-RUN pip install https://github.com/diana-hep/packtivity/archive/master.zip
-RUN pip install https://github.com/diana-hep/yadage/archive/master.zip
+FROM fedora:25
+RUN dnf -y update && \
+    dnf install -y gcc gcc-c++ graphviz-devel ImageMagick python-devel libffi-devel openssl openssl-devel openssh-clients unzip nano autoconf automake libtool python-pip &&\
+    dnf install -y dnf redhat-rpm-config
 ADD . /code
 WORKDIR /code
+RUN pip install --upgrade pip && \
+    pip install -e .[all]
 ARG QUEUE_ENV=default
 ENV QUEUE_ENV ${QUEUE_ENV}
 ENV PYTHONPATH=/workdir
 ENV PACKTIVITY_ASYNCBACKEND reana_workflow_engine_yadage.externalbackend:ExternalBackend:ExternalProxy
-RUN dnf install -y openssh-clients
-RUN pip install zmq
 CMD celery -A reana_workflow_engine_yadage.celeryapp worker -l info -Q ${QUEUE_ENV}
