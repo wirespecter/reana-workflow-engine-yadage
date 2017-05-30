@@ -34,10 +34,9 @@ from reana_workflow_engine_yadage.celeryapp import app
 from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
-API_VERSION = 'api/v1.0'
 
 
-def run_yadage_workflow_standalone(jobguid, ctx):
+def run_yadage_workflow_standalone(workflow_uuid, ctx):
     log.info('getting socket..')
 
     zmqctx = reana_workflow_engine_yadage.celery_zeromq.get_context()
@@ -46,15 +45,20 @@ def run_yadage_workflow_standalone(jobguid, ctx):
 
     log.info('running recast workflow on context: {ctx}'.format(ctx=ctx))
 
-    taskdir = os.path.join('/data', jobguid)
-    if not os.path.exists(taskdir):
-        os.makedirs(taskdir)
+    analysis_directory = os.path.join(
+        os.getenv('SHARED_VOLUME', '/data'),
+        'default_tenant',  # FIXME should come as parameter from RWC
+        'analyses',
+        workflow_uuid)
 
-    workdir = os.path.join(taskdir, 'yadage')
+    analysis_workspace = os.path.join(analysis_directory, 'workspace')
+
+    if not os.path.exists(analysis_workspace):
+        os.makedirs(analysis_workspace)
 
     cap_backend = setupbackend_fromstring('fromenv')
 
-    with steering_ctx(workdir=workdir,
+    with steering_ctx(workdir=analysis_workspace,
                       workflow=ctx['workflow'],
                       loadtoplevel=ctx['toplevel'],
                       initdata=ctx['preset_pars'],
@@ -63,14 +67,14 @@ def run_yadage_workflow_standalone(jobguid, ctx):
                       backend=cap_backend) as ys:
 
         ys.adage_argument(additional_trackers=[
-            ZeroMQTracker(socket=socket, identifier=jobguid)])
+            ZeroMQTracker(socket=socket, identifier=workflow_uuid)])
         log.info('added zmq tracker.. ready to go..')
-        log.info('zmq publishing under: %s', jobguid)
+        log.info('zmq publishing under: %s', workflow_uuid)
 
     log.info('workflow done')
 
 
 @app.task(name='tasks.run_yadage_workflow', ignore_result=True)
 def run_yadage_workflow(ctx):
-    jobguid = run_yadage_workflow.request.id
-    run_yadage_workflow_standalone(str(jobguid), ctx)
+    workflow_uuid = run_yadage_workflow.request.id
+    run_yadage_workflow_standalone(str(workflow_uuid), ctx)
