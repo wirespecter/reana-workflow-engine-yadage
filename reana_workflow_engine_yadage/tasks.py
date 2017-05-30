@@ -24,6 +24,7 @@ from __future__ import absolute_import, print_function
 
 import logging
 import os
+from glob import glob
 
 import zmq
 from yadage.clihelpers import setupbackend_fromstring
@@ -66,10 +67,20 @@ def run_yadage_workflow_standalone(workflow_uuid, ctx):
                       loginterval=5,
                       backend=cap_backend) as ys:
 
+        for status_file in glob(os.path.join(analysis_directory, '.status.*')):
+            os.remove(status_file)
+
+        open(os.path.join(analysis_directory, '.status.running'), 'a').close()
+
         ys.adage_argument(additional_trackers=[
             ZeroMQTracker(socket=socket, identifier=workflow_uuid)])
         log.info('added zmq tracker.. ready to go..')
         log.info('zmq publishing under: %s', workflow_uuid)
+
+    for status_file in glob(os.path.join(analysis_directory, '.status.*')):
+        os.remove(status_file)
+
+    open(os.path.join(analysis_directory, '.status.finished'), 'a').close()
 
     log.info('workflow done')
 
