@@ -67,8 +67,8 @@ install_requires = [
     'requests==2.11.1',
     'yadage-schemas==0.6.0',
     'adage==0.7.1',
-    'packtivity==0.5.15',
-    'yadage==0.10.7',
+    'packtivity==0.5.18',
+    'yadage==0.10.8',
 ]
 
 packages = find_packages()
