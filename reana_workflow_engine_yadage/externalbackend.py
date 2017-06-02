@@ -1,16 +1,3 @@
-import base64
-import logging
-import os
-import pipes
-
-import submit
-
-from packtivity.asyncbackends import PacktivityProxyBase
-from packtivity.syncbackends import build_job, packconfig, publish
-
-log = logging.getLogger('yadage.cap.externalproxy')
-
-
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
@@ -32,6 +19,19 @@ log = logging.getLogger('yadage.cap.externalproxy')
 # In applying this license, CERN does not waive the privileges and immunities
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
+
+import base64
+import logging
+import os
+import pipes
+
+from packtivity.asyncbackends import PacktivityProxyBase
+from packtivity.syncbackends import build_job, packconfig, publish
+
+import submit
+
+log = logging.getLogger('yadage.cap.externalproxy')
+
 
 def create_context(context):
     [os.makedirs(x) for x in context['readwrite']]

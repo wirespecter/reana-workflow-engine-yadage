@@ -25,13 +25,13 @@ from __future__ import absolute_import, print_function
 import logging
 import os
 
-import reana_workflow_engine_yadage.celery_zeromq
 import zmq
-
-from reana_workflow_engine_yadage.celeryapp import app
-from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 from yadage.clihelpers import setupbackend_fromstring
 from yadage.steering_api import steering_ctx
+
+import reana_workflow_engine_yadage.celery_zeromq
+from reana_workflow_engine_yadage.celeryapp import app
+from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
 API_VERSION = 'api/v1.0'

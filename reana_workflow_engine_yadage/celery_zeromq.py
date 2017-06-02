@@ -22,9 +22,8 @@
 
 import logging
 
-from celery import signals
-
 import zmq
+from celery import signals
 
 ZMQ_SOCKET_LINGER = 100
 context = zmq.Context()
