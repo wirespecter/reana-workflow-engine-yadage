@@ -48,7 +48,7 @@ def run_yadage_workflow_standalone(workflow_uuid, ctx):
 
     analysis_directory = os.path.join(
         os.getenv('SHARED_VOLUME', '/data'),
-        'default_tenant',  # FIXME should come as parameter from RWC
+        '00000000-0000-0000-0000-000000000000',  # FIXME parameter from RWC
         'analyses',
         workflow_uuid)
 
