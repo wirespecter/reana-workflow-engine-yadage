@@ -25,7 +25,7 @@ RUN dnf -y update && \
 ADD . /code
 WORKDIR /code
 RUN pip install --upgrade pip && \
-    pip install -e .[all]
+    pip install -e .
 ARG QUEUE_ENV=default
 ENV QUEUE_ENV ${QUEUE_ENV}
 ENV PYTHONPATH=/workdir

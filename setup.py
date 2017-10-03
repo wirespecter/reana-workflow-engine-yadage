@@ -65,10 +65,10 @@ install_requires = [
     'celery==3.1.17',
     'pyzmq==16.0.2',
     'requests==2.11.1',
-    'yadage-schemas==0.6.0',
-    'adage==0.7.1',
-    'packtivity==0.5.18',
-    'yadage-fork==0.10.8',
+    'yadage-schemas==0.7.4',
+    'adage==0.8.2',
+    'packtivity==0.8.8',
+    'yadage==0.12.13',
 ]
 
 packages = find_packages()

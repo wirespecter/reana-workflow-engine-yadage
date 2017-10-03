@@ -27,8 +27,8 @@ import os
 from glob import glob
 
 import zmq
-from yadage.clihelpers import setupbackend_fromstring
 from yadage.steering_api import steering_ctx
+from yadage.utils import setupbackend_fromstring
 
 import reana_workflow_engine_yadage.celery_zeromq
 from reana_workflow_engine_yadage.celeryapp import app
@@ -59,10 +59,16 @@ def run_yadage_workflow_standalone(workflow_uuid, ctx):
 
     cap_backend = setupbackend_fromstring('fromenv')
 
-    with steering_ctx(workdir=analysis_workspace,
-                      workflow=ctx['workflow'],
-                      loadtoplevel=ctx['toplevel'],
+    with steering_ctx(dataarg=analysis_workspace,
+                      workflow_json=ctx['workflow'],  # FIXME `workflow_json`
+                                                      # only valid for
+                                                      # workflow files,
+                                                      # use `workflow` when
+                                                      # workflow file name
+                                                      # provided.
+                      toplevel=ctx['toplevel'],
                       initdata=ctx['preset_pars'],
+                      visualize=False,
                       updateinterval=5,
                       loginterval=5,
                       backend=cap_backend) as ys:

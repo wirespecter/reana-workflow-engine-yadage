@@ -33,10 +33,6 @@ import submit
 log = logging.getLogger('yadage.cap.externalproxy')
 
 
-def create_context(context):
-    [os.makedirs(x) for x in context['readwrite']]
-
-
 def make_oneliner(job):
     wrapped_cmd = 'sh -c {}  '.format(
         pipes.quote(job['command'])
@@ -57,11 +53,11 @@ def make_script(job):
 
 
 class ExternalProxy(PacktivityProxyBase):
-    def __init__(self, job_id, spec, pars, ctx):
+    def __init__(self, job_id, spec, pars, state):
         self.job_id = job_id
         self.spec = spec
         self.pars = pars
-        self.ctx = ctx
+        self.state = state
 
     def proxyname(self):
         return 'ExternalProxy'
@@ -71,7 +67,7 @@ class ExternalProxy(PacktivityProxyBase):
             'job_id': self.job_id,
             'spec': self.spec,
             'pars': self.pars,
-            'ctx': self.ctx
+            'state': self.state.json(),
         }
 
     @classmethod
@@ -80,7 +76,7 @@ class ExternalProxy(PacktivityProxyBase):
             data['proxydetails']['job_id'],
             data['proxydetails']['spec'],
             data['proxydetails']['pars'],
-            data['proxydetails']['ctx']
+            data['proxydetails']['state']
         )
 
 
@@ -91,8 +87,8 @@ class ExternalBackend(object):
     def prepublish(self, spec, parameters, context):
         return None
 
-    def submit(self, spec, parameters, context):
-        job = build_job(spec['process'], parameters, self.config)
+    def submit(self, spec, parameters, state, metadata):
+        job = build_job(spec['process'], parameters, state, self.config)
 
         if 'command' in job:
             wrapped_cmd = make_oneliner(job)
@@ -102,10 +98,10 @@ class ExternalBackend(object):
         image = spec['environment']['image']
         # tag = spec['environment']['imagetag']
 
-        log.info('state context is %s', context)
+        log.info('state context is %s', state)
         log.info('would run job %s', job)
 
-        create_context(context)
+        state.ensure()
 
         log.info('submitting!')
 
@@ -118,13 +114,13 @@ class ExternalBackend(object):
             job_id=job_id,
             spec=spec,
             pars=parameters,
-            ctx=context
+            state=state
         )
 
     def result(self, resultproxy):
         return publish(
             resultproxy.spec['publisher'],
-            resultproxy.pars, resultproxy.ctx, self.config
+            resultproxy.pars, resultproxy.state, self.config
         )
 
     def ready(self, resultproxy):

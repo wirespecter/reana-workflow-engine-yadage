@@ -22,7 +22,7 @@
 
 import json
 
-from yadage.helpers import WithJsonRefEncoder
+from yadage.utils import WithJsonRefEncoder
 
 
 class ZeroMQTracker(object):
