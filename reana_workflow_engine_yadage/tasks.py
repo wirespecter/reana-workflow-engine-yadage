@@ -37,61 +37,122 @@ from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 log = logging.getLogger(__name__)
 
 
-def run_yadage_workflow_standalone(workflow_uuid, ctx):
+available_workflow_status = (
+    'running',
+    'finished',
+    'failed',
+)
+
+
+def create_analysis_workspace(
+        workflow_uuid,
+        user_uuid='00000000-0000-0000-0000-000000000000'):
+    """Create analysis and workflow workspaces.
+
+    A directory structure will be created where
+    `/data/:user_uuid/analyses/:analysis_uuid` represents the analysis
+    workspace and `/data/:user_uuid/analyses/:analysis_uuid/workspace`
+    the workflow workspace.
+
+    :param workflow_uuid: Analysis UUID.
+    :return: Workflow and analysis workspace path.
+    """
+    analysis_workspace = os.path.join(
+        os.getenv('SHARED_VOLUME', '/data'),
+        user_uuid, 'analyses', workflow_uuid)
+
+    workflow_workspace = os.path.join(analysis_workspace, 'workspace')
+    if not os.path.exists(workflow_workspace):
+        os.makedirs(workflow_workspace)
+
+    return workflow_workspace, analysis_workspace
+
+
+def update_analysis_status(status, analysis_workspace, message=None):
+    """Update analysis status using a status file.
+
+    :param status: String that represents the analysis status.
+    :param analysis_workspace: Path to the analysis to update.
+
+    :raises: IOError, ValueError
+    """
+    try:
+        if status not in available_workflow_status:
+            raise ValueError(
+                '{0} is not a valid status see the available list: {1}'.format(
+                    status, available_workflow_status))
+
+        for status_file in glob(os.path.join(analysis_workspace, '.status.*')):
+            os.remove(status_file)
+
+        with open(os.path.join(analysis_workspace, '.status.{status}'.format(
+                status=status)), 'a') as status_file:
+            if message:
+                status_file.write(message)
+
+    except IOError as e:
+        raise e
+    except ValueError as e:
+        raise e
+
+
+def run_yadage_workflow_standalone(workflow_uuid, analysis_workspace=None,
+                                   workflow=None, workflow_json=None,
+                                   toplevel=os.getcwd(), parameters=None):
     log.info('getting socket..')
 
     zmqctx = reana_workflow_engine_yadage.celery_zeromq.get_context()
     socket = zmqctx.socket(zmq.PUB)
     socket.connect(os.environ['ZMQ_PROXY_CONNECT'])
 
-    log.info('running recast workflow on context: {ctx}'.format(ctx=ctx))
-
-    analysis_directory = os.path.join(
-        os.getenv('SHARED_VOLUME', '/data'),
-        '00000000-0000-0000-0000-000000000000',  # FIXME parameter from RWC
-        'analyses',
-        workflow_uuid)
-
-    analysis_workspace = os.path.join(analysis_directory, 'workspace')
-
-    if not os.path.exists(analysis_workspace):
-        os.makedirs(analysis_workspace)
-
     cap_backend = setupbackend_fromstring('fromenv')
 
-    with steering_ctx(dataarg=analysis_workspace,
-                      workflow_json=ctx['workflow'],  # FIXME `workflow_json`
-                                                      # only valid for
-                                                      # workflow files,
-                                                      # use `workflow` when
-                                                      # workflow file name
-                                                      # provided.
-                      toplevel=ctx['toplevel'],
-                      initdata=ctx['preset_pars'],
-                      visualize=False,
-                      updateinterval=5,
-                      loginterval=5,
-                      backend=cap_backend) as ys:
+    workflow_workspace, analysis_workspace = \
+        create_analysis_workspace(workflow_uuid)
 
-        for status_file in glob(os.path.join(analysis_directory, '.status.*')):
-            os.remove(status_file)
+    if workflow_json:
+        # When `yadage` is launched using an already validated workflow file.
+        workflow_kwargs = dict(workflow_json=workflow_json)
+    elif workflow:
+        # When `yadage` resolves the workflow file from a remote repository:
+        # i.e. github:reanahub/reana-demo-root6-roofit/workflow.yaml
+        workflow_kwargs = dict(workflow=workflow, toplevel=toplevel)
 
-        open(os.path.join(analysis_directory, '.status.running'), 'a').close()
+    try:
+        with steering_ctx(dataarg=workflow_workspace,
+                          initdata=parameters,
+                          visualize=False,
+                          updateinterval=5,
+                          loginterval=5,
+                          backend=cap_backend,
+                          **workflow_kwargs) as ys:
 
-        ys.adage_argument(additional_trackers=[
-            ZeroMQTracker(socket=socket, identifier=workflow_uuid)])
-        log.info('added zmq tracker.. ready to go..')
-        log.info('zmq publishing under: %s', workflow_uuid)
+            log.info('running workflow on context: {0}'.format(locals()))
+            update_analysis_status('running', analysis_workspace)
 
-    for status_file in glob(os.path.join(analysis_directory, '.status.*')):
-        os.remove(status_file)
+            ys.adage_argument(additional_trackers=[
+                ZeroMQTracker(socket=socket, identifier=workflow_uuid)])
+            log.info('added zmq tracker.. ready to go..')
+            log.info('zmq publishing under: %s', workflow_uuid)
 
-    open(os.path.join(analysis_directory, '.status.finished'), 'a').close()
+        update_analysis_status('finished', analysis_workspace)
 
-    log.info('workflow done')
+        log.info('workflow done')
+    except Exception as e:
+        log.info('workflow failed: {0}'.format(e))
+        update_analysis_status('failed', analysis_workspace, message=str(e))
 
 
 @app.task(name='tasks.run_yadage_workflow', ignore_result=True)
 def run_yadage_workflow(ctx):
     workflow_uuid = run_yadage_workflow.request.id
-    run_yadage_workflow_standalone(str(workflow_uuid), ctx)
+
+    if isinstance(ctx['workflow'], dict):
+        run_yadage_workflow_standalone(str(workflow_uuid),
+                                       workflow_json=ctx['workflow'],
+                                       parameters=ctx['preset_pars'])
+    else:
+        run_yadage_workflow_standalone(str(workflow_uuid),
+                                       workflow=ctx['workflow'],
+                                       toplevel=ctx['toplvel'],
+                                       parameters=ctx['preset_pars'])
