@@ -24,7 +24,6 @@ from __future__ import absolute_import, print_function
 
 import logging
 import os
-from glob import glob
 
 import zmq
 from yadage.steering_api import steering_ctx
@@ -32,19 +31,14 @@ from yadage.utils import setupbackend_fromstring
 
 import reana_workflow_engine_yadage.celery_zeromq
 from reana_workflow_engine_yadage.celeryapp import app
+from reana_workflow_engine_yadage.database import load_session
+from reana_workflow_engine_yadage.models import Workflow, WorkflowStatus
 from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
 
 
-available_workflow_status = (
-    'running',
-    'finished',
-    'failed',
-)
-
-
-def create_analysis_workspace(
+def create_workflow_workspace(
         workflow_uuid,
         user_uuid='00000000-0000-0000-0000-000000000000'):
     """Create analysis and workflow workspaces.
@@ -55,7 +49,7 @@ def create_analysis_workspace(
     the workflow workspace.
 
     :param workflow_uuid: Analysis UUID.
-    :return: Workflow and analysis workspace path.
+    :return: Tuple composed of workflow and analysis workspace paths.
     """
     analysis_workspace = os.path.join(
         os.getenv('SHARED_VOLUME', '/data'),
@@ -68,31 +62,45 @@ def create_analysis_workspace(
     return workflow_workspace, analysis_workspace
 
 
-def update_analysis_status(status, analysis_workspace, message=None):
-    """Update analysis status using a status file.
+def update_workflow_status(db_session, workflow_uuid, status, message=None):
+    """Update database workflow status.
 
+    :param workflow_uuid: UUID which represents the workflow.
     :param status: String that represents the analysis status.
-    :param analysis_workspace: Path to the analysis to update.
-
-    :raises: IOError, ValueError
+    :param status_message: String that represents the message related with the
+       status, if there is any.
     """
     try:
-        if status not in available_workflow_status:
-            raise ValueError(
-                '{0} is not a valid status see the available list: {1}'.format(
-                    status, available_workflow_status))
+        workflow = \
+            db_session.query(Workflow).filter_by(id_=workflow_uuid).first()
 
-        for status_file in glob(os.path.join(analysis_workspace, '.status.*')):
-            os.remove(status_file)
+        if not workflow:
+            raise Exception('Workflow {0} doesn\'t exist in database.'.format(
+                workflow_uuid))
 
-        with open(os.path.join(analysis_workspace, '.status.{status}'.format(
-                status=status)), 'a') as status_file:
-            if message:
-                status_file.write(message)
-
-    except IOError as e:
+        workflow.status = status
+        db_session.commit()
+    except Exception as e:
+        log.info(
+            'An error occurred while updating workflow: {0}'.format(str(e)))
         raise e
-    except ValueError as e:
+
+
+def create_workflow(db_session, workflow_uuid, workspace_path,
+                    owner_uuid='00000000-0000-0000-0000-000000000000'):
+    """Create workflow on database.
+
+    :param workflow_uuid: UUID which represents the workflow.
+    :param workspace: String which represents the workflow workspace path.
+    """
+    # create workflow on database
+    try:
+        workflow = Workflow(id_=workflow_uuid,
+                            workspace_path=workspace_path, owner_id=owner_uuid)
+        db_session.add(workflow)
+        db_session.commit()
+    except Exception as e:
+        log.info('Workflow couldn\'t be added to the database: {0}'.format(e))
         raise e
 
 
@@ -108,7 +116,10 @@ def run_yadage_workflow_standalone(workflow_uuid, analysis_workspace=None,
     cap_backend = setupbackend_fromstring('fromenv')
 
     workflow_workspace, analysis_workspace = \
-        create_analysis_workspace(workflow_uuid)
+        create_workflow_workspace(workflow_uuid)
+
+    db_session = load_session()
+    create_workflow(db_session, workflow_uuid, analysis_workspace)
 
     if workflow_json:
         # When `yadage` is launched using an already validated workflow file.
@@ -128,19 +139,31 @@ def run_yadage_workflow_standalone(workflow_uuid, analysis_workspace=None,
                           **workflow_kwargs) as ys:
 
             log.info('running workflow on context: {0}'.format(locals()))
-            update_analysis_status('running', analysis_workspace)
+            update_workflow_status(
+                db_session,
+                workflow_uuid,
+                WorkflowStatus.running)
 
             ys.adage_argument(additional_trackers=[
                 ZeroMQTracker(socket=socket, identifier=workflow_uuid)])
             log.info('added zmq tracker.. ready to go..')
             log.info('zmq publishing under: %s', workflow_uuid)
 
-        update_analysis_status('finished', analysis_workspace)
+        update_workflow_status(
+            db_session,
+            workflow_uuid,
+            WorkflowStatus.finished)
 
         log.info('workflow done')
     except Exception as e:
         log.info('workflow failed: {0}'.format(e))
-        update_analysis_status('failed', analysis_workspace, message=str(e))
+        update_workflow_status(
+            db_session,
+            workflow_uuid,
+            WorkflowStatus.failed,
+            message=str(e))
+    finally:
+        db_session.close()
 
 
 @app.task(name='tasks.run_yadage_workflow', ignore_result=True)
