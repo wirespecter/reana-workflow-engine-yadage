@@ -38,30 +38,6 @@ from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 log = logging.getLogger(__name__)
 
 
-def create_workflow_workspace(
-        workflow_uuid,
-        user_uuid='00000000-0000-0000-0000-000000000000'):
-    """Create analysis and workflow workspaces.
-
-    A directory structure will be created where
-    `/data/:user_uuid/analyses/:analysis_uuid` represents the analysis
-    workspace and `/data/:user_uuid/analyses/:analysis_uuid/workspace`
-    the workflow workspace.
-
-    :param workflow_uuid: Analysis UUID.
-    :return: Tuple composed of workflow and analysis workspace paths.
-    """
-    analysis_workspace = os.path.join(
-        os.getenv('SHARED_VOLUME', '/data'),
-        user_uuid, 'analyses', workflow_uuid)
-
-    workflow_workspace = os.path.join(analysis_workspace, 'workspace')
-    if not os.path.exists(workflow_workspace):
-        os.makedirs(workflow_workspace)
-
-    return workflow_workspace, analysis_workspace
-
-
 def update_workflow_status(db_session, workflow_uuid, status, message=None):
     """Update database workflow status.
 
@@ -86,27 +62,10 @@ def update_workflow_status(db_session, workflow_uuid, status, message=None):
         raise e
 
 
-def create_workflow(db_session, workflow_uuid, workspace_path,
-                    owner_uuid='00000000-0000-0000-0000-000000000000'):
-    """Create workflow on database.
-
-    :param workflow_uuid: UUID which represents the workflow.
-    :param workspace: String which represents the workflow workspace path.
-    """
-    # create workflow on database
-    try:
-        workflow = Workflow(id_=workflow_uuid,
-                            workspace_path=workspace_path, owner_id=owner_uuid)
-        db_session.add(workflow)
-        db_session.commit()
-    except Exception as e:
-        log.info('Workflow couldn\'t be added to the database: {0}'.format(e))
-        raise e
-
-
-def run_yadage_workflow_standalone(workflow_uuid, analysis_workspace=None,
-                                   workflow=None, workflow_json=None,
-                                   toplevel=os.getcwd(), parameters=None):
+@app.task(name='tasks.run_yadage_workflow', ignore_result=True)
+def run_yadage_workflow(workflow_uuid, workflow_workspace,
+                        workflow=None, workflow_json=None,
+                        toplevel=os.getcwd(), parameters=None):
     log.info('getting socket..')
 
     zmqctx = reana_workflow_engine_yadage.celery_zeromq.get_context()
@@ -115,11 +74,7 @@ def run_yadage_workflow_standalone(workflow_uuid, analysis_workspace=None,
 
     cap_backend = setupbackend_fromstring('fromenv')
 
-    workflow_workspace, analysis_workspace = \
-        create_workflow_workspace(workflow_uuid)
-
     db_session = load_session()
-    create_workflow(db_session, workflow_uuid, analysis_workspace)
 
     if workflow_json:
         # When `yadage` is launched using an already validated workflow file.
@@ -131,7 +86,7 @@ def run_yadage_workflow_standalone(workflow_uuid, analysis_workspace=None,
 
     try:
         with steering_ctx(dataarg=workflow_workspace,
-                          initdata=parameters,
+                          initdata=parameters if parameters else {},
                           visualize=False,
                           updateinterval=5,
                           loginterval=5,
@@ -164,18 +119,3 @@ def run_yadage_workflow_standalone(workflow_uuid, analysis_workspace=None,
             message=str(e))
     finally:
         db_session.close()
-
-
-@app.task(name='tasks.run_yadage_workflow', ignore_result=True)
-def run_yadage_workflow(ctx):
-    workflow_uuid = run_yadage_workflow.request.id
-
-    if isinstance(ctx['workflow'], dict):
-        run_yadage_workflow_standalone(str(workflow_uuid),
-                                       workflow_json=ctx['workflow'],
-                                       parameters=ctx['preset_pars'])
-    else:
-        run_yadage_workflow_standalone(str(workflow_uuid),
-                                       workflow=ctx['workflow'],
-                                       toplevel=ctx['toplvel'],
-                                       parameters=ctx['preset_pars'])
