@@ -30,7 +30,7 @@ from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy_utils import UUIDType
+from sqlalchemy_utils import JSONType, UUIDType
 
 Base = declarative_base()
 
@@ -69,6 +69,9 @@ class Workflow(Base):
     workspace_path = Column(String(255))
     status = Column(Enum(WorkflowStatus), default=WorkflowStatus.created)
     owner_id = Column(UUIDType, ForeignKey('user.id_'))
+    specification = Column(JSONType)
+    parameters = Column(JSONType)
+    type_ = Column(String(30))
 
     def __repr__(self):
         """Workflow string represetantion."""
