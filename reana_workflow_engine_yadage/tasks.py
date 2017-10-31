@@ -31,6 +31,7 @@ from yadage.utils import setupbackend_fromstring
 
 import reana_workflow_engine_yadage.celery_zeromq
 from reana_workflow_engine_yadage.celeryapp import app
+from reana_workflow_engine_yadage.config import INPUTS_DIRECTORY_RELATIVE_PATH
 from reana_workflow_engine_yadage.database import load_session
 from reana_workflow_engine_yadage.models import Workflow, WorkflowStatus
 from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
@@ -84,8 +85,14 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
         # i.e. github:reanahub/reana-demo-root6-roofit/workflow.yaml
         workflow_kwargs = dict(workflow=workflow, toplevel=toplevel)
 
+    # Set `workflow_workspace/inputs_directory_relative_path` as the input
+    # directory
+    dataops = {'initdir': os.path.join(workflow_workspace,
+                                       INPUTS_DIRECTORY_RELATIVE_PATH)}
+
     try:
         with steering_ctx(dataarg=workflow_workspace,
+                          dataops=dataops,
                           initdata=parameters if parameters else {},
                           visualize=False,
                           updateinterval=5,

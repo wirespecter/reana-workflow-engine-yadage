@@ -24,6 +24,9 @@
 
 import os
 
+INPUTS_DIRECTORY_RELATIVE_PATH = 'inputs'
+"""Represents the relative path to the inputs directory (populated by RWC)"""
+
 SHARED_VOLUME = os.getenv('SHARED_VOLUME', '/reana/default')
 """Path to the mounted REANA shared volume."""
 
