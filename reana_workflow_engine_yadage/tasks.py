@@ -37,6 +37,8 @@ from reana_workflow_engine_yadage.models import Workflow, WorkflowStatus
 from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
+outputs_dir_name = 'outputs'
+known_dirs = ['inputs', 'logs', outputs_dir_name]
 
 
 def update_workflow_status(db_session, workflow_uuid, status, message=None):
@@ -126,3 +128,15 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
             message=str(e))
     finally:
         db_session.close()
+        # since we don't know the yadage workflow name upfront we get the
+        # unknown directory. This should be fixed using Yadage API to retrieve
+        # the workflow name.
+        yadage_workflow_dir = \
+            set(os.listdir(workflow_workspace)).difference(known_dirs).pop()
+        if yadage_workflow_dir:
+            absolute_outputs_directory_path = os.path.join(workflow_workspace,
+                                                           outputs_dir_name)
+            os.symlink(yadage_workflow_dir, absolute_outputs_directory_path)
+            log.info('Workflow outputs symlinked to `/outputs` directory.')
+        else:
+            log.info('Workflow directory not found so no outputs available.')
