@@ -29,12 +29,12 @@ import zmq
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
-import reana_workflow_engine_yadage.celery_zeromq
-from reana_workflow_engine_yadage.celeryapp import app
-from reana_workflow_engine_yadage.config import INPUTS_DIRECTORY_RELATIVE_PATH
-from reana_workflow_engine_yadage.database import load_session
-from reana_workflow_engine_yadage.models import Workflow, WorkflowStatus
-from reana_workflow_engine_yadage.zeromq_tracker import ZeroMQTracker
+from . import celery_zeromq
+from .celeryapp import app
+from .config import INPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME
+from .database import load_session
+from .models import Workflow, WorkflowStatus
+from .zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
 outputs_dir_name = 'outputs'
@@ -71,7 +71,9 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                         toplevel=os.getcwd(), parameters=None):
     log.info('getting socket..')
 
-    zmqctx = reana_workflow_engine_yadage.celery_zeromq.get_context()
+    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME, workflow_workspace)
+
+    zmqctx = celery_zeromq.get_context()
     socket = zmqctx.socket(zmq.PUB)
     socket.connect(os.environ['ZMQ_PROXY_CONNECT'])
 
