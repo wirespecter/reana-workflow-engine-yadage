@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2017, 2018 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it under the
 # terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,19 @@ import os
 
 INPUTS_DIRECTORY_RELATIVE_PATH = 'inputs'
 """Represents the relative path to the inputs directory (populated by RWC)"""
+
+OUTPUTS_DIRECTORY_RELATIVE_PATH = 'outputs'
+"""Represents the relative path to the outputs directory."""
+
+CODE_DIRECTORY_RELATIVE_PATH = 'code'
+"""Represents the relative path to the code directory (populated by RWC)"""
+
+LOGS_DIRECTORY_RELATIVE_PATH = 'logs'
+"""Represents the relative path to the logs directory."""
+
+YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH = 'yadage_inputs'
+"""Wrapper directory which contains all directories that `yadage` will use as
+   input."""
 
 SHARED_VOLUME = os.getenv('SHARED_VOLUME', '/reana/default')
 """Path to the mounted REANA shared volume."""

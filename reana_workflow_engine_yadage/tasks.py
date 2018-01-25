@@ -31,14 +31,23 @@ from yadage.utils import setupbackend_fromstring
 
 from . import celery_zeromq
 from .celeryapp import app
-from .config import INPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME
+from .config import (CODE_DIRECTORY_RELATIVE_PATH,
+                     INPUTS_DIRECTORY_RELATIVE_PATH,
+                     LOGS_DIRECTORY_RELATIVE_PATH,
+                     OUTPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME,
+                     YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH)
 from .database import load_session
 from .models import Workflow, WorkflowStatus
 from .zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
-outputs_dir_name = 'outputs'
-known_dirs = ['inputs', 'logs', outputs_dir_name]
+known_dirs = [
+    CODE_DIRECTORY_RELATIVE_PATH,
+    INPUTS_DIRECTORY_RELATIVE_PATH,
+    LOGS_DIRECTORY_RELATIVE_PATH,
+    OUTPUTS_DIRECTORY_RELATIVE_PATH,
+    YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH,
+]
 
 
 def update_workflow_status(db_session, workflow_uuid, status, message=None):
@@ -89,10 +98,40 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
         # i.e. github:reanahub/reana-demo-root6-roofit/workflow.yaml
         workflow_kwargs = dict(workflow=workflow, toplevel=toplevel)
 
-    # Set `workflow_workspace/inputs_directory_relative_path` as the input
-    # directory
-    dataopts = {'initdir': os.path.join(workflow_workspace,
-                                        INPUTS_DIRECTORY_RELATIVE_PATH)}
+    # Since we need code and input data accessible from `cmd` section on yadage
+    # we will copy `INPUTS_DIRECTORY_RELATIVE_PATH` and
+    # `CODE_DIRECTORY_RELATIVE_PATH` inside the configured
+    # `YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH`
+    # Remove once `yadage` accepts multiple `initdir`.
+    absolute_yadage_inputs_directory_path = os.path.join(
+        workflow_workspace, '..',
+        YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH)
+    log.info('Creating {0}'.format(absolute_yadage_inputs_directory_path))
+    os.makedirs(absolute_yadage_inputs_directory_path)
+    absolute_inputs_directory_path = os.path.join(
+        workflow_workspace, '..',
+        INPUTS_DIRECTORY_RELATIVE_PATH)
+    absolute_inputs_directory_path = os.path.join(
+        workflow_workspace, '..',
+        INPUTS_DIRECTORY_RELATIVE_PATH)
+    absolute_code_directory_path = os.path.join(
+        workflow_workspace, '..',
+        CODE_DIRECTORY_RELATIVE_PATH)
+    log.info('Copying {source} to {dest}.'.format(
+        source=absolute_inputs_directory_path,
+        dest=absolute_yadage_inputs_directory_path))
+    os.system('cp -R {source} {dest}'.format(
+        source=absolute_inputs_directory_path,
+        dest=absolute_yadage_inputs_directory_path))
+    log.info('Copied {source} to {dest}.'.format(
+        source=absolute_code_directory_path,
+        dest=absolute_yadage_inputs_directory_path))
+    os.system('cp -R {source} {dest}'.format(
+        source=absolute_code_directory_path,
+        dest=absolute_yadage_inputs_directory_path))
+    # Set `workflow_workspace/yadage_inputs_directory_relative_path` as the
+    # input directory
+    dataopts = {'initdir': absolute_yadage_inputs_directory_path}
 
     try:
         with steering_ctx(dataarg=workflow_workspace,
@@ -130,15 +169,16 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
             message=str(e))
     finally:
         db_session.close()
-        # since we don't know the yadage workflow name upfront we get the
-        # unknown directory. This should be fixed using Yadage API to retrieve
-        # the workflow name.
-        yadage_workflow_dir = \
-            set(os.listdir(workflow_workspace)).difference(known_dirs).pop()
-        if yadage_workflow_dir:
-            absolute_outputs_directory_path = os.path.join(workflow_workspace,
-                                                           outputs_dir_name)
-            os.symlink(yadage_workflow_dir, absolute_outputs_directory_path)
-            log.info('Workflow outputs symlinked to `/outputs` directory.')
-        else:
-            log.info('Workflow directory not found so no outputs available.')
+        yadage_workflow_workspace_content = \
+            os.path.join(workflow_workspace, '*')
+        absolute_outputs_directory_path = os.path.join(
+            workflow_workspace, '..', OUTPUTS_DIRECTORY_RELATIVE_PATH)
+        # Remove outputs directory since `shutil.copytree` needs an empty
+        # dst directory.
+        log.info('Copying {source} to {dest}.'.format(
+            source=yadage_workflow_workspace_content,
+            dest=absolute_outputs_directory_path))
+        os.system('cp -R {source} {dest}'.format(
+            source=yadage_workflow_workspace_content,
+            dest=absolute_outputs_directory_path))
+        log.info('Workflow outputs copied to `/outputs` directory.')
