@@ -20,4 +20,27 @@
 .. image:: https://img.shields.io/github/license/reanahub/reana-workflow-engine-yadage.svg
       :target: https://github.com/reanahub/reana-workflow-engine-yadage/blob/master/COPYING
 
-The workflow engine yadage component of the REANA system.
+About
+-----
+
+REANA-Workflow-Engine-Yadage is a component of the `REANA
+<http://reanahub.io/>`_ reusable analysis platform. It takes care of
+instantiating, executing and managing `Yadage
+<https://github.com/diana-hep/yadage>`_ based computational workflows.
+
+Features
+--------
+
+- start Yadage workflows
+- control workflow steps
+
+Useful links
+------------
+
+- `documentation <https://reana-workflow-engine-yadage.readthedocs.io/>`_
+- `releases <https://github.com/reanahub/reana-workflow-engine-yadage/releases>`_
+- `known issues <https://github.com/reanahub/reana-workflow-engine-yadage/issues>`_
+- `source code <https://github.com/reanahub/reana-workflow-engine-yadage>`_
+
+For more information about the REANA reusable analysis platform, please see the
+general `REANA documentation <http://reana.readthedocs.io/>`_.

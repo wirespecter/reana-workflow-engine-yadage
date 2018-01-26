@@ -1,7 +1,8 @@
 Authors
 =======
 
+The list of contributors in alphabetical order:
+
 * Diego Rodriguez <diego.rodriguez@cern.ch>
-* Jiri Kuncar <jiri.kuncar@cern.ch>
 * Lukas Heinrich <lukas.heinrich@gmail.com>
 * Tibor Simko <tibor.simko@cern.ch>

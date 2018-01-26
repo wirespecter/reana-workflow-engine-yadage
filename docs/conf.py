@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'reana'
-copyright = '2017, info@reana.io'
+copyright = '2017, 2018, info@reana.io'
 author = 'info@reana.io'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -112,7 +112,7 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'logo': 'logo-reana.png',
-    'description': 'REANA Workflow Engine Yadage',
+    'description': 'REANA-Workflow-Engine-Yadage',
     'github_user': 'reanahub',
     'github_repo': 'reana-workflow-engine-yadage',
     'github_button': False,
