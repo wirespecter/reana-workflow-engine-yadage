@@ -72,6 +72,7 @@ class Workflow(Base):
     specification = Column(JSONType)
     parameters = Column(JSONType)
     type_ = Column(String(30))
+    logs = Column(String, default="")
 
     def __repr__(self):
         """Workflow string represetantion."""
