@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.2.0 (2018-04-19)
+--------------------------
+
+- Upgrades Yadage workflow ecosystem versions (Yadage 0.13, Packtivity 0.10).
+- Adds logs to the workflow models in the database.
+
 Version 0.1.0 (2018-01-30)
 --------------------------
 
