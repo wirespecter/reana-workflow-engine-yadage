@@ -20,6 +20,7 @@
 
 include Dockerfile
 include .dockerignore
+include requirements-dev.txt
 include COPYING
 include *.rst
 include *.sh

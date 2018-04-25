@@ -72,6 +72,7 @@ install_requires = [
     'adage==0.8.5',
     'packtivity==0.10.0',
     'yadage==0.13.5',
+    'reana-commons>=0.1.0',
 ]
 
 packages = find_packages()

@@ -20,12 +20,16 @@
 
 FROM fedora:25
 RUN dnf -y update && \
-    dnf install -y gcc gcc-c++ graphviz-devel ImageMagick python-devel libffi-devel openssl openssl-devel openssh-clients unzip nano autoconf automake libtool python-pip &&\
+    dnf install -y gcc gcc-c++ graphviz-devel ImageMagick python-devel libffi-devel openssl openssl-devel openssh-clients unzip nano autoconf automake libtool python-pip git &&\
     dnf install -y dnf redhat-rpm-config
+
+RUN pip install -e git://github.com/reanahub/reana-commons.git@master#egg=reana-commons
+
 ADD . /code
 WORKDIR /code
 RUN pip install --upgrade pip && \
     pip install -e .
+
 ARG QUEUE_ENV=default
 ENV QUEUE_ENV ${QUEUE_ENV}
 ENV PYTHONPATH=/workdir
