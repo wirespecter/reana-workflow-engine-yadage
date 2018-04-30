@@ -25,7 +25,7 @@ import logging
 
 import requests
 
-JOBCONTROLLER_HOST = 'job-controller.default.svc.cluster.local'
+from .config import JOBCONTROLLER_HOST
 
 log = logging.getLogger('yadage.cap.submit')
 

@@ -51,3 +51,9 @@ SQLALCHEMY_DATABASE_URI = \
         SHARED_VOLUME=SHARED_VOLUME,
         REANA_DB_FILE=REANA_DB_FILE)
 """SQL database URI."""
+
+JOBCONTROLLER_HOST = os.getenv('JOBCONTROLLER_HOST',
+                               'job-controller.default.svc.cluster.local')
+
+BROKER = os.getenv('RABBIT_MQ', 'amqp://test:1234@'
+                   'message-broker.default.svc.cluster.local//')

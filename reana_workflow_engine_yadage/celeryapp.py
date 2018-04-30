@@ -24,9 +24,10 @@ from __future__ import absolute_import
 
 from celery import Celery
 
+from .config import BROKER
+
 app = Celery('tasks',
-             broker='amqp://test:1234@'
-                    'message-broker.default.svc.cluster.local//',
+             broker=BROKER,
              include=['reana_workflow_engine_yadage.tasks'])
 
 
