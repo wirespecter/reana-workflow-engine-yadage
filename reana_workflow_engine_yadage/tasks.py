@@ -36,7 +36,7 @@ from .celeryapp import app
 from .config import (CODE_DIRECTORY_RELATIVE_PATH,
                      INPUTS_DIRECTORY_RELATIVE_PATH,
                      LOGS_DIRECTORY_RELATIVE_PATH,
-                     OUTPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME,
+                     OUTPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME_PATH,
                      YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH)
 from .zeromq_tracker import ZeroMQTracker
 
@@ -80,7 +80,8 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                         toplevel=os.getcwd(), parameters=None):
     log.info('getting socket..')
 
-    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME, workflow_workspace)
+    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
+                                          workflow_workspace)
 
     zmqctx = celery_zeromq.get_context()
     socket = zmqctx.socket(zmq.PUB)
