@@ -167,7 +167,7 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
             WorkflowStatus.failed,
             message=str(e))
     finally:
-        db_session.close()
+        db_session.remove()
         yadage_workflow_workspace_content = \
             os.path.join(workflow_workspace, '*')
         absolute_outputs_directory_path = os.path.join(
