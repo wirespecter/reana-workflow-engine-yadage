@@ -129,10 +129,13 @@ class ExternalBackend(object):
         )
 
     def ready(self, resultproxy):
-        return submit.check_status(resultproxy.job_id)['status'] != 'started'
+        print('got:', submit.check_status(resultproxy.job_id))
+        return submit.check_status(
+            resultproxy.job_id)['job']['status'] != 'started'
 
     def successful(self, resultproxy):
-        return submit.check_status(resultproxy.job_id)['status'] == 'succeeded'
+        return submit.check_status(
+            resultproxy.job_id)['job']['status'] == 'succeeded'
 
     def fail_info(self, resultproxy):
         pass

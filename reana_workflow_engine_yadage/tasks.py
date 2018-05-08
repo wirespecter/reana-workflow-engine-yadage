@@ -25,9 +25,10 @@ from __future__ import absolute_import, print_function
 import logging
 import os
 
+import pika
 import zmq
-from reana_commons.database import Session as db_session
-from reana_commons.models import Workflow, WorkflowStatus
+import json
+
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
@@ -36,8 +37,9 @@ from .celeryapp import app
 from .config import (CODE_DIRECTORY_RELATIVE_PATH,
                      INPUTS_DIRECTORY_RELATIVE_PATH,
                      LOGS_DIRECTORY_RELATIVE_PATH,
-                     OUTPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME_PATH,
-                     YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH)
+                     OUTPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME,
+                     YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH,
+                     BROKER_URL, BROKER_USER, BROKER_PASS, BROKER_PORT)
 from .zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
@@ -50,7 +52,7 @@ known_dirs = [
 ]
 
 
-def update_workflow_status(db_session, workflow_uuid, status, message=None):
+def publish_workflow_status(workflow_uuid, status, message=None):
     """Update database workflow status.
 
     :param workflow_uuid: UUID which represents the workflow.
@@ -58,20 +60,25 @@ def update_workflow_status(db_session, workflow_uuid, status, message=None):
     :param status_message: String that represents the message related with the
        status, if there is any.
     """
-    try:
-        workflow = \
-            db_session.query(Workflow).filter_by(id_=workflow_uuid).first()
-
-        if not workflow:
-            raise Exception('Workflow {0} doesn\'t exist in database.'.format(
-                workflow_uuid))
-
-        workflow.status = status
-        db_session.commit()
-    except Exception as e:
-        log.info(
-            'An error occurred while updating workflow: {0}'.format(str(e)))
-        raise e
+    broker_credentials = pika.PlainCredentials(BROKER_USER,
+                                               BROKER_PASS)
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(BROKER_URL,
+                                  BROKER_PORT,
+                                  '/',
+                                  broker_credentials))
+    channel = connection.channel()
+    channel.queue_declare(queue='yadage-jobs')
+    log.info('Publishing Workflow: {0} Status: {1}'.format(workflow_uuid,
+                                                           status))
+    channel.basic_publish(exchange='',
+                          routing_key='yadage-jobs',
+                          body=json.dumps({"workflow_uuid": workflow_uuid,
+                                           "status": status,
+                                           "message": message}),
+                          properties=pika.BasicProperties(
+                              delivery_mode=2,  # msg persistent
+                          ))
 
 
 @app.task(name='tasks.run_yadage_workflow', ignore_result=True)
@@ -80,8 +87,7 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                         toplevel=os.getcwd(), parameters=None):
     log.info('getting socket..')
 
-    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
-                                          workflow_workspace)
+    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME, workflow_workspace)
 
     zmqctx = celery_zeromq.get_context()
     socket = zmqctx.socket(zmq.PUB)
@@ -143,31 +149,21 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                           **workflow_kwargs) as ys:
 
             log.info('running workflow on context: {0}'.format(locals()))
-            update_workflow_status(
-                db_session,
-                workflow_uuid,
-                WorkflowStatus.running)
+            publish_workflow_status(workflow_uuid, 1)
 
             ys.adage_argument(additional_trackers=[
                 ZeroMQTracker(socket=socket, identifier=workflow_uuid)])
             log.info('added zmq tracker.. ready to go..')
             log.info('zmq publishing under: %s', workflow_uuid)
 
-        update_workflow_status(
-            db_session,
-            workflow_uuid,
-            WorkflowStatus.finished)
+        publish_workflow_status(workflow_uuid, 2)
 
         log.info('workflow done')
     except Exception as e:
         log.info('workflow failed: {0}'.format(e))
-        update_workflow_status(
-            db_session,
-            workflow_uuid,
-            WorkflowStatus.failed,
-            message=str(e))
+        publish_workflow_status(workflow_uuid, 3)
+
     finally:
-        db_session.remove()
         yadage_workflow_workspace_content = \
             os.path.join(workflow_workspace, '*')
         absolute_outputs_directory_path = os.path.join(
