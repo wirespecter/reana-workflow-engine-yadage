@@ -26,7 +26,6 @@ from celery import Celery
 
 from .config import BROKER
 
-
 app = Celery('tasks',
              broker=BROKER,
              include=['reana_workflow_engine_yadage.tasks'])

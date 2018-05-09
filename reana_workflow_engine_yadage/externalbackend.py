@@ -129,7 +129,6 @@ class ExternalBackend(object):
         )
 
     def ready(self, resultproxy):
-        print('got:', submit.check_status(resultproxy.job_id))
         return submit.check_status(
             resultproxy.job_id)['job']['status'] != 'started'
 

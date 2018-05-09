@@ -22,24 +22,23 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 import logging
 import os
 
 import pika
 import zmq
-import json
-
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
 from . import celery_zeromq
 from .celeryapp import app
-from .config import (CODE_DIRECTORY_RELATIVE_PATH,
+from .config import (BROKER_PASS, BROKER_PORT, BROKER_URL, BROKER_USER,
+                     CODE_DIRECTORY_RELATIVE_PATH,
                      INPUTS_DIRECTORY_RELATIVE_PATH,
                      LOGS_DIRECTORY_RELATIVE_PATH,
-                     OUTPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME,
-                     YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH,
-                     BROKER_URL, BROKER_USER, BROKER_PASS, BROKER_PORT)
+                     OUTPUTS_DIRECTORY_RELATIVE_PATH, SHARED_VOLUME_PATH,
+                     YADAGE_INPUTS_DIRECTORY_RELATIVE_PATH)
 from .zeromq_tracker import ZeroMQTracker
 
 log = logging.getLogger(__name__)
@@ -68,11 +67,11 @@ def publish_workflow_status(workflow_uuid, status, message=None):
                                   '/',
                                   broker_credentials))
     channel = connection.channel()
-    channel.queue_declare(queue='yadage-jobs')
+    channel.queue_declare(queue='jobs-status')
     log.info('Publishing Workflow: {0} Status: {1}'.format(workflow_uuid,
                                                            status))
     channel.basic_publish(exchange='',
-                          routing_key='yadage-jobs',
+                          routing_key='jobs-status',
                           body=json.dumps({"workflow_uuid": workflow_uuid,
                                            "status": status,
                                            "message": message}),
@@ -87,7 +86,8 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                         toplevel=os.getcwd(), parameters=None):
     log.info('getting socket..')
 
-    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME, workflow_workspace)
+    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
+                                          workflow_workspace)
 
     zmqctx = celery_zeromq.get_context()
     socket = zmqctx.socket(zmq.PUB)
