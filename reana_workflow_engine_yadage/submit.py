@@ -49,7 +49,7 @@ def submit(experiment, image, cmd):
         headers={'content-type': 'application/json'}
     )
 
-    job_id = str(response.json()['job_id'])
+    job_id = str(response.json())
     return job_id
 
 
@@ -63,7 +63,7 @@ def check_status(job_id):
         headers={'cache-control': 'no-cache'}
     )
 
-    job_info = response.json()
+    job_info = str(response.json())
     return job_info
 
 
