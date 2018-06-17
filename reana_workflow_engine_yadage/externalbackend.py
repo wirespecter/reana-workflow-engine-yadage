@@ -20,6 +20,7 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
+import ast
 import base64
 import logging
 import os
@@ -117,7 +118,7 @@ class ExternalBackend(object):
 
         log.info('submitted job: %s', job_id)
         publish_workflow_status(app.conf.get('WORKFLOW_UUID'), 1,
-                                message={"job_id": job_id})
+                                message={"job_id": job_id.decode('utf-8')})
         return ExternalProxy(
             job_id=job_id,
             spec=spec,
@@ -134,12 +135,16 @@ class ExternalBackend(object):
         )
 
     def ready(self, resultproxy):
-        return submit.check_status(
-            resultproxy.job_id)['status'] != 'started'
+        resultproxy = ast.literal_eval(resultproxy.job_id)
+        status_res = submit.check_status(
+            resultproxy['job_id'])
+        return status_res['status'] != 'started'
 
     def successful(self, resultproxy):
-        return submit.check_status(
-            resultproxy.job_id)['status'] == 'succeeded'
+        resultproxy = ast.literal_eval(resultproxy.job_id)
+        status_res = submit.check_status(
+            resultproxy['job_id'])
+        return status_res['status'] == 'succeeded'
 
     def fail_info(self, resultproxy):
         pass

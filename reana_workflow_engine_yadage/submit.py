@@ -62,8 +62,7 @@ def check_status(job_id):
         ),
         headers={'cache-control': 'no-cache'}
     )
-
-    job_info = str(response.json())
+    job_info = response.json()
     return job_info
 
 
