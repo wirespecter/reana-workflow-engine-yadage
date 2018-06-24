@@ -112,15 +112,23 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'logo': 'logo-reana.png',
-    'description': 'REANA-Workflow-Engine-Yadage',
-    'github_user': 'reanahub',
+    'description': """<p>REANA-Workflow-Engine-Yadage is a component of the <a
+                      href="http://www.reana.io">REANA</a> reusable and
+                      reproducible research data analysis
+                      platform.</p><p>REANA-Workflow-Engine-Yadage takes care
+                      of instantiating, executing and managing <a
+                      href="https://github.com/diana-hep/yadage">Yadage</a>
+                      based computational workflows.</p>""",
+'github_user': 'reanahub',
     'github_repo': 'reana-workflow-engine-yadage',
     'github_button': False,
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
+        'REANA@DockerHub': 'https://hub.docker.com/u/reanahub/',
         'REANA@GitHub': 'https://github.com/reanahub',
-        'REANA@DockerHub': 'https://hub.docker.com/r/reanahub/',
+        'REANA@Twitter': 'https://twitter.com/reanahub',
+        'REANA@Web': 'http://www.reana.io',
     }
 }
 
