@@ -62,7 +62,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'celery==3.1.17',
+    'celery>=4.2.1',
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
