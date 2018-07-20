@@ -43,10 +43,11 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                         workflow=None, workflow_json=None,
                         toplevel=os.getcwd(), parameters=None):
     log.info('getting socket..')
-
     workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
                                           workflow_workspace)
-    app.conf.update(WORKFLOW_UUID=workflow_uuid)
+    # use some shared object between tasks.
+    app.current_worker_task.workflow_uuid = workflow_uuid
+    app.current_worker_task.workflow_workspace = workflow_workspace
 
     cap_backend = setupbackend_fromstring('fromenv')
 
@@ -79,9 +80,9 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
         publish_workflow_status(workflow_uuid, 2)
 
         log.info('Workflow {workflow_uuid} finished. Files available '
-             'at {workflow_workspace}.'.format(
-                 workflow_uuid=workflow_uuid,
-                 workflow_workspace=workflow_workspace))
+                 'at {workflow_workspace}.'.format(
+                     workflow_uuid=workflow_uuid,
+                     workflow_workspace=workflow_workspace))
     except Exception as e:
         log.info('workflow failed: {0}'.format(e))
         publish_workflow_status(workflow_uuid, 3)

@@ -24,6 +24,7 @@ import json
 import logging
 
 import requests
+from celery import current_app
 
 from .config import JOBCONTROLLER_HOST
 
@@ -35,7 +36,9 @@ def submit(experiment, image, cmd):
         'experiment': experiment,
         'docker_img': image,
         'cmd': cmd,
-        'env_vars': {}
+        'env_vars': {},
+        'workflow_workspace':
+        current_app.current_worker_task.workflow_workspace,
     }
 
     log.info('submitting %s', json.dumps(job_spec, indent=4, sort_keys=True))
