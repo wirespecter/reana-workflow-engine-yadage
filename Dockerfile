@@ -23,8 +23,7 @@ RUN dnf -y update && \
     dnf install -y gcc gcc-c++ graphviz-devel ImageMagick python-devel libffi-devel openssl openssl-devel openssh-clients unzip nano autoconf automake libtool python-pip git &&\
     dnf install -y dnf redhat-rpm-config
 
-RUN pip install --upgrade pip && \
-    pip install git+git://github.com/reanahub/reana-commons.git@master#egg=reana-commons
+RUN pip install --upgrade pip
 
 COPY CHANGES.rst README.rst setup.py /code/
 COPY reana_workflow_engine_yadage/version.py /code/reana_workflow_engine_yadage/
