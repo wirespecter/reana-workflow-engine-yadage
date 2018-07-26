@@ -31,11 +31,13 @@ from .config import JOBCONTROLLER_HOST
 log = logging.getLogger('yadage.cap.submit')
 
 
-def submit(experiment, image, cmd):
+def submit(name, experiment, image, cmd, prettified_cmd):
     job_spec = {
+        'job_name': name,
         'experiment': experiment,
         'docker_img': image,
         'cmd': cmd,
+        'prettified_cmd': prettified_cmd,
         'env_vars': {},
         'workflow_workspace':
         current_app.current_worker_task.workflow_workspace,

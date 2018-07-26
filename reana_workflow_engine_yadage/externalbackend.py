@@ -97,8 +97,10 @@ class ExternalBackend(object):
         job = build_job(spec['process'], parameters, state, self.config)
 
         if 'command' in job:
+            prettified_cmd = job['command']
             wrapped_cmd = make_oneliner(job)
         elif 'script' in job:
+            prettified_cmd = job['script']
             wrapped_cmd = make_script(job)
 
         image = spec['environment']['image']
@@ -112,8 +114,9 @@ class ExternalBackend(object):
         log.info('submitting!')
 
         job_id = submit.submit(
+            metadata['name'],
             os.getenv('REANA_WORKFLOW_ENGINE_YADAGE_EXPERIMENT', 'default'),
-            image, wrapped_cmd)
+            image, wrapped_cmd, prettified_cmd)
 
         log.info('submitted job: %s', job_id)
         publish_workflow_status(app.current_worker_task.workflow_uuid, 1,
