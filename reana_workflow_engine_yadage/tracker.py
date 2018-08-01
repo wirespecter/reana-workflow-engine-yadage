@@ -93,9 +93,9 @@ class REANATracker(object):
         progress = {
             "engine_specific": None,
             "failed": {"total": 0, "job_ids": []},
-            "planned": {"total": 0, "job_ids": []},
-            "submitted": {"total": 0, "job_ids": []},
-            "succeeded": {"total": 0, "job_ids": []}
+            "total": {"total": 0, "job_ids": []},
+            "running": {"total": 0, "job_ids": []},
+            "finished": {"total": 0, "job_ids": []}
         }
 
         progress['engine_specific'] = jq.jq('{dag: {edges: .dag.edges, nodes: \
@@ -104,17 +104,17 @@ class REANATracker(object):
 
         for node in analyze_progress(adageobj):
             key = {
-                'running': 'submitted',
-                'succeeded': 'succeeded',
+                'running': 'running',
+                'succeeded': 'finished',
                 'failed': 'failed',
                 'unsubmittable': 'planned',
-                'scheduled': 'planned',
+                'scheduled': 'total',
             }[node['state']]
             progress[key]['total'] += 1
             if isinstance(node['job_id'], str):
                 job_id_dict = ast.literal_eval(node['job_id'])
                 job_id = job_id_dict['job_id']
-                if key in ['submitted', 'succeeded', 'failed']:
+                if key in ['running', 'finished', 'failed']:
                     progress[key]['job_ids'].append(job_id)
 
         log_message = 'this is a tracking log at {}'.format(
