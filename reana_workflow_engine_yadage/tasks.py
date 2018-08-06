@@ -33,7 +33,7 @@ from yadage.utils import setupbackend_fromstring
 from .celeryapp import app
 from .config import SHARED_VOLUME_PATH
 from .tracker import REANATracker
-from .utils import publish_workflow_status
+from .utils import publisher
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +60,6 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
         workflow_kwargs = dict(workflow=workflow, toplevel=toplevel)
 
     dataopts = {'initdir': workflow_workspace}
-
     try:
         with steering_ctx(dataarg=workflow_workspace,
                           dataopts=dataopts,
@@ -72,12 +71,12 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                           **workflow_kwargs) as ys:
 
             log.info('running workflow on context: {0}'.format(locals()))
-            publish_workflow_status(workflow_uuid, 1)
+            publisher.publish_workflow_status(workflow_uuid, 1)
 
             ys.adage_argument(additional_trackers=[
                 REANATracker(identifier=workflow_uuid)])
 
-        publish_workflow_status(workflow_uuid, 2)
+        publisher.publish_workflow_status(workflow_uuid, 2)
 
         log.info('Workflow {workflow_uuid} finished. Files available '
                  'at {workflow_workspace}.'.format(
@@ -85,4 +84,4 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
                      workflow_workspace=workflow_workspace))
     except Exception as e:
         log.info('workflow failed: {0}'.format(e))
-        publish_workflow_status(workflow_uuid, 3)
+        publisher.publish_workflow_status(workflow_uuid, 3)

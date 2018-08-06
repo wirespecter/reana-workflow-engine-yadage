@@ -32,7 +32,7 @@ from packtivity.syncbackends import (build_job, contextualize_parameters,
 
 from . import submit
 from .celeryapp import app
-from .utils import publish_workflow_status
+from .utils import publisher
 
 log = logging.getLogger('yadage.cap.externalproxy')
 
@@ -119,8 +119,9 @@ class ExternalBackend(object):
             image, wrapped_cmd, prettified_cmd)
 
         log.info('submitted job: %s', job_id)
-        publish_workflow_status(app.current_worker_task.workflow_uuid, 1,
-                                message={"job_id": job_id.decode('utf-8')})
+        publisher.publish_workflow_status(
+            app.current_worker_task.workflow_uuid, 1,
+            message={"job_id": job_id.decode('utf-8')})
         return ExternalProxy(
             job_id=job_id,
             spec=spec,

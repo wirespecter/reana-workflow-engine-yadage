@@ -24,6 +24,7 @@ RUN dnf -y update && \
     dnf install -y dnf redhat-rpm-config
 
 RUN pip install --upgrade pip
+RUN pip install -e git+git://github.com/reanahub/reana-commons.git@master#egg=reana-commons
 
 COPY CHANGES.rst README.rst setup.py /code/
 COPY reana_workflow_engine_yadage/version.py /code/reana_workflow_engine_yadage/
@@ -33,6 +34,7 @@ RUN pip install --no-cache-dir requirements-builder && \
     pip uninstall -y requirements-builder
 
 COPY . /code
+
 
 # Debug off by default
 ARG DEBUG=false

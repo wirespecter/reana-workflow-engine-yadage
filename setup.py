@@ -69,6 +69,7 @@ install_requires = [
     'pyzmq==16.0.2',
     'requests==2.11.1',
     'yadage-schemas==0.7.16',
+    'reana-commons>=0.3.0.dev20180418',
     'adage==0.8.5',
     'packtivity==0.10.0',
     'yadage==0.13.5',

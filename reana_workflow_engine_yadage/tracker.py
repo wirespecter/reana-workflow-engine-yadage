@@ -31,11 +31,7 @@ import jq
 import networkx as nx
 from yadage.utils import WithJsonRefEncoder
 
-from .utils import publish_workflow_status
-
-# def publish_workflow_status(*args, **kwargs):
-#     pass
-
+from .utils import publisher
 
 log = logging.getLogger(__name__)
 
@@ -129,8 +125,9 @@ class REANATracker(object):
                     {}
                     '''.format(self.workflow_id,
                                json.dumps(progress, indent=4), log_message))
-        publish_workflow_status(self.workflow_id, status=1, message={
-                                "progress": progress}, logs=log_message)
+        publisher.publish_workflow_status(
+            self.workflow_id, status=1, logs=log_message,
+            message={"progress": progress})
 
     def finalize(self, adageobj):
         self.track(adageobj)

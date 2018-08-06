@@ -22,35 +22,7 @@
 
 import json
 
-import pika
+from reana_commons.publisher import Publisher
 
-from .config import BROKER_PASS, BROKER_PORT, BROKER_URL, BROKER_USER
-
-
-def publish_workflow_status(workflow_uuid, status, message=None, logs=None):
-    """Update database workflow status.
-
-    :param workflow_uuid: UUID which represents the workflow.
-    :param status: String that represents the analysis status.
-    :param status_message: String that represents the message related with the
-       status, if there is any.
-    """
-
-    broker_credentials = pika.PlainCredentials(BROKER_USER,
-                                               BROKER_PASS)
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(BROKER_URL,
-                                  BROKER_PORT,
-                                  '/',
-                                  broker_credentials))
-    channel = connection.channel()
-    channel.queue_declare(queue='jobs-status')
-    channel.basic_publish(exchange='',
-                          routing_key='jobs-status',
-                          body=json.dumps({"workflow_uuid": workflow_uuid,
-                                           "status": status,
-                                           "logs": logs,
-                                           "message": message}),
-                          properties=pika.BasicProperties(
-                              delivery_mode=2,  # msg persistent
-                          ))
+publisher = Publisher()
+publisher.connect()
