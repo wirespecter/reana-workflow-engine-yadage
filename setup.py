@@ -62,18 +62,18 @@ setup_requires = [
 ]
 
 install_requires = [
+    'adage==0.8.5',
     'celery>=4.2.1',
     'enum34>=1.1.6',
-    'SQLAlchemy>=1.1.14',
-    'SQLAlchemy-Utils>=0.32.18',
-    'pyzmq==16.0.2',
-    'requests==2.11.1',
-    'yadage-schemas==0.7.16',
-    'reana-commons>=0.3.0.dev20180418',
-    'adage==0.8.5',
     'packtivity==0.10.0',
+    'pika>=0.12.0',
+    'pyzmq==16.0.2',
+    'reana-commons>=0.3.0',
+    'requests==2.11.1',
+    'SQLAlchemy-Utils>=0.32.18',
+    'SQLAlchemy>=1.1.14',
+    'yadage-schemas==0.7.16',
     'yadage==0.13.5',
-    'pika==0.11.2',
 ]
 
 packages = find_packages()
