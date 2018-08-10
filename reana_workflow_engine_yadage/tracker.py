@@ -19,6 +19,7 @@
 # In applying this license, CERN does not waive the privileges and immunities
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
+"""REANA-Workflow-Engine-yadage workflow state tracker."""
 
 import ast
 import datetime
@@ -37,6 +38,7 @@ log = logging.getLogger(__name__)
 
 
 def analyze_progress(adageobj):
+    """Analyze the workflow progress."""
     dag, rules, applied = adageobj.dag, adageobj.rules, adageobj.applied_rules
     successful, failed, running, unsubmittable = 0, 0, 0, 0
 
@@ -71,16 +73,20 @@ def analyze_progress(adageobj):
 
 
 class REANATracker(object):
+    """REANA specific progress tracker."""
 
     def __init__(self, identifier=None):
+        """Build the tracker object."""
         self.workflow_id = identifier
         log.info('initializing REANA workflow tracker for id {}'.format(
             self.workflow_id))
 
     def initialize(self, adageobj):
+        """Initialize the progress tracker."""
         self.track(adageobj)
 
     def track(self, adageobj):
+        """Tracks progress."""
         log.info('sending progress information')
         serialized = json.dumps(adageobj.json(), cls=WithJsonRefEncoder,
                                 sort_keys=True)
@@ -130,4 +136,5 @@ class REANATracker(object):
             message={"progress": progress})
 
     def finalize(self, adageobj):
+        """Finilizes the progress tracking."""
         self.track(adageobj)

@@ -19,6 +19,7 @@
 # In applying this license, CERN does not waive the privileges and immunities
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
+"""REANA-Workflow-Engine-yadage module to submit calls to RJC."""
 
 import json
 import logging
@@ -32,6 +33,16 @@ log = logging.getLogger('yadage.cap.submit')
 
 
 def submit(name, experiment, image, cmd, prettified_cmd):
+    """Submit a job to RJC API.
+
+    :param name: Name of the job.
+    :param experiment: Experiment the job belongs to.
+    :param image: Identifier of the Docker image which will run the job.
+    :param cmd: String which represents the command to execute. It can be
+        modified by the workflow engine i.e. prepending ``cd /some/dir/``.
+    :prettified_cmd: Original command submitted by the user.
+    :return: Returns the ``job_id``.
+    """
     job_spec = {
         'job_name': name,
         'experiment': experiment,
@@ -59,6 +70,7 @@ def submit(name, experiment, image, cmd, prettified_cmd):
 
 
 def check_status(job_id):
+    """Check the status of a given job."""
     response = requests.get(
         'http://{host}/{resource}/{id}'.format(
             host=JOBCONTROLLER_HOST,
@@ -72,6 +84,7 @@ def check_status(job_id):
 
 
 def get_logs(job_id):
+    """Retrieve logs for a given job."""
     response = requests.get(
         'http://{host}/{resource}/{id}/logs'.format(
             host=JOBCONTROLLER_HOST,

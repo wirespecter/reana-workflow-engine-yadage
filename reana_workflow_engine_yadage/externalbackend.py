@@ -19,6 +19,7 @@
 # In applying this license, CERN does not waive the privileges and immunities
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
+"""REANA-Workflow-Engine-yadage REANA packtivity backend."""
 
 import ast
 import base64
@@ -38,6 +39,7 @@ log = logging.getLogger('yadage.cap.externalproxy')
 
 
 def make_oneliner(job):
+    """Convert a command into oneliner."""
     wrapped_cmd = 'sh -c {}  '.format(
         pipes.quote(job['command'])
     )
@@ -45,6 +47,7 @@ def make_oneliner(job):
 
 
 def make_script(job):
+    """Encode script type commands in base64."""
     encoded_script = base64.b64encode(job['script'])
     cmd = 'echo {encoded}|base64 -d|{interpreter}'.format(
             encoded=encoded_script,
@@ -57,16 +60,21 @@ def make_script(job):
 
 
 class ExternalProxy(PacktivityProxyBase):
+    """REANA yadage external proxy."""
+
     def __init__(self, job_id, spec, pars, state):
+        """Initialize yadage external proxy."""
         self.job_id = job_id
         self.spec = spec
         self.pars = pars
         self.state = state
 
     def proxyname(self):
+        """Return the proxy name."""
         return 'ExternalProxy'
 
     def details(self):
+        """Retrieve the proxy details."""
         return {
             'job_id': self.job_id,
             'spec': self.spec,
@@ -76,6 +84,7 @@ class ExternalProxy(PacktivityProxyBase):
 
     @classmethod
     def fromJSON(cls, data):
+        """Retrieve proxy details from JSON."""
         return cls(
             data['proxydetails']['job_id'],
             data['proxydetails']['spec'],
@@ -85,13 +94,18 @@ class ExternalProxy(PacktivityProxyBase):
 
 
 class ExternalBackend(object):
+    """REANA yadage external packtivity backend class."""
+
     def __init__(self):
+        """Initialize the REANA packtivity backend."""
         self.config = packconfig()
 
     def prepublish(self, spec, parameters, context):
+        """."""
         return None
 
     def submit(self, spec, parameters, state, metadata):
+        """Submit a yadage packtivity to RJC."""
         parameters = contextualize_parameters(parameters,
                                               state)
         job = build_job(spec['process'], parameters, state, self.config)
@@ -130,6 +144,7 @@ class ExternalBackend(object):
         )
 
     def result(self, resultproxy):
+        """Retrieve the result of a pactivity run by RJC."""
         resultproxy.pars = contextualize_parameters(resultproxy.pars,
                                                     resultproxy.state)
         return publish(
@@ -138,16 +153,19 @@ class ExternalBackend(object):
         )
 
     def ready(self, resultproxy):
+        """Check if a packtivity is finished."""
         resultproxy = ast.literal_eval(resultproxy.job_id)
         status_res = submit.check_status(
             resultproxy['job_id'])
         return status_res['status'] != 'started'
 
     def successful(self, resultproxy):
+        """Check if the pactivity was successful."""
         resultproxy = ast.literal_eval(resultproxy.job_id)
         status_res = submit.check_status(
             resultproxy['job_id'])
         return status_res['status'] == 'succeeded'
 
     def fail_info(self, resultproxy):
+        """Retreive the fail info."""
         pass

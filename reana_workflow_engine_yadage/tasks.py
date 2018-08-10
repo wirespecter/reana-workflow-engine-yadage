@@ -19,6 +19,7 @@
 # In applying this license, CERN does not waive the privileges and immunities
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
+"""REANA-Workflow-Engine-yadage Celery tasks."""
 
 from __future__ import absolute_import, print_function
 
@@ -42,6 +43,7 @@ log = logging.getLogger(__name__)
 def run_yadage_workflow(workflow_uuid, workflow_workspace,
                         workflow=None, workflow_json=None,
                         toplevel=os.getcwd(), parameters=None):
+    """Run a ``yadage`` workflow."""
     log.info('getting socket..')
     workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
                                           workflow_workspace)
