@@ -63,7 +63,7 @@ setup_requires = [
 
 install_requires = [
     'adage==0.8.5',
-    'celery>=4.2.1',
+    'celery>=4.2.1,<4.3',
     'enum34>=1.1.6',
     'packtivity==0.10.0',
     'pika>=0.12.0',
