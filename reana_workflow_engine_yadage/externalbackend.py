@@ -13,12 +13,14 @@ import logging
 import os
 import pipes
 
+from celery import current_app
 from packtivity.asyncbackends import PacktivityProxyBase
 from packtivity.syncbackends import (build_job, contextualize_parameters,
                                      packconfig, publish)
+from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
-from . import submit
 from .celeryapp import app
+from .config import COMPONENTS_DATA
 from .utils import publisher
 
 log = logging.getLogger('yadage.cap.externalproxy')
@@ -85,6 +87,9 @@ class ExternalBackend(object):
     def __init__(self):
         """Initialize the REANA packtivity backend."""
         self.config = packconfig()
+        self.rjc_api_client = rjc_api_client(
+            'reana_workflow_engine_yadage',
+            COMPONENTS_DATA['reana-job-controller'])
 
     def prepublish(self, spec, parameters, context):
         """."""
@@ -113,17 +118,20 @@ class ExternalBackend(object):
 
         log.info('submitting!')
 
-        job_id = submit.submit(
-            metadata['name'],
+        job_id = self.rjc_api_client.submit(
             os.getenv('REANA_WORKFLOW_ENGINE_YADAGE_EXPERIMENT', 'default'),
-            image, wrapped_cmd, prettified_cmd)
+            image,
+            wrapped_cmd,
+            prettified_cmd,
+            current_app.current_worker_task.workflow_workspace,
+            metadata['name'],)
 
         log.info('submitted job: %s', job_id)
         publisher.publish_workflow_status(
             app.current_worker_task.workflow_uuid, 1,
-            message={"job_id": job_id.decode('utf-8')})
+            message={"job_id": str(job_id).decode('utf-8')})
         return ExternalProxy(
-            job_id=job_id,
+            job_id=str(job_id),
             spec=spec,
             pars=parameters,
             state=state
@@ -141,14 +149,14 @@ class ExternalBackend(object):
     def ready(self, resultproxy):
         """Check if a packtivity is finished."""
         resultproxy = ast.literal_eval(resultproxy.job_id)
-        status_res = submit.check_status(
+        status_res = self.rjc_api_client.check_status(
             resultproxy['job_id'])
         return status_res['status'] != 'started'
 
     def successful(self, resultproxy):
         """Check if the pactivity was successful."""
         resultproxy = ast.literal_eval(resultproxy.job_id)
-        status_res = submit.check_status(
+        status_res = self.rjc_api_client.check_status(
             resultproxy['job_id'])
         return status_res['status'] == 'succeeded'
 

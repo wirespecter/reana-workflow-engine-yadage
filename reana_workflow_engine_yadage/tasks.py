@@ -13,7 +13,6 @@ import json
 import logging
 import os
 
-import zmq
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
