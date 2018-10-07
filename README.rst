@@ -2,9 +2,6 @@
  REANA-Workflow-Engine-Yadage
 ==============================
 
-.. image:: https://img.shields.io/pypi/pyversions/reana-workflow-engine-yadage.svg
-      :target: https://pypi.org/pypi/reana-workflow-engine-yadage
-
 .. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-yadage.svg
       :target: https://travis-ci.org/reanahub/reana-workflow-engine-yadage
 
@@ -18,7 +15,7 @@
       :target: https://gitter.im/reanahub/reana?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
 .. image:: https://img.shields.io/github/license/reanahub/reana-workflow-engine-yadage.svg
-      :target: https://github.com/reanahub/reana-workflow-engine-yadage/blob/master/COPYING
+      :target: https://github.com/reanahub/reana-workflow-engine-yadage/blob/master/LICENSE
 
 About
 -----
