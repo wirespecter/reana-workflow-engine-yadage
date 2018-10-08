@@ -20,7 +20,6 @@ from packtivity.syncbackends import (build_job, contextualize_parameters,
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
 from .celeryapp import app
-from .config import COMPONENTS_DATA
 from .utils import publisher
 
 log = logging.getLogger('yadage.cap.externalproxy')
@@ -87,9 +86,7 @@ class ExternalBackend(object):
     def __init__(self):
         """Initialize the REANA packtivity backend."""
         self.config = packconfig()
-        self.rjc_api_client = rjc_api_client(
-            'reana_workflow_engine_yadage',
-            COMPONENTS_DATA['reana-job-controller'])
+        self.rjc_api_client = rjc_api_client('reana-job-controller')
 
     def prepublish(self, spec, parameters, context):
         """."""
