@@ -9,7 +9,6 @@
 
 import json
 
-from reana_commons.publisher import Publisher
+from reana_commons.publisher import WorkflowStatusPublisher
 
-publisher = Publisher()
-publisher.connect()
+publisher = WorkflowStatusPublisher()
