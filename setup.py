@@ -54,7 +54,7 @@ install_requires = [
     'packtivity==0.10.0',
     'pika>=0.12.0',
     'pyzmq==16.0.2',
-    'reana-commons>=0.3.1,<0.4',
+    'reana-commons>=0.4.0.dev20181011,<0.5.0',
     'requests==2.11.1',
     'SQLAlchemy-Utils>=0.32.18',
     'SQLAlchemy>=1.1.14',
