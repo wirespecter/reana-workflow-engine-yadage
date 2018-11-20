@@ -13,13 +13,14 @@ from celery import Celery
 
 from .config import BROKER
 
-app = Celery('tasks',
+app = Celery('tasks', backend='rpc://',
              broker=BROKER,
              include=['reana_workflow_engine_yadage.tasks'])
 
 
 app.conf.update(CELERY_ACCEPT_CONTENT=['json'],
-                CELERY_TASK_SERIALIZER='json')
+                CELERY_TASK_SERIALIZER='json',
+                broker_pool_limit=None)
 
 if __name__ == '__main__':
     app.start()

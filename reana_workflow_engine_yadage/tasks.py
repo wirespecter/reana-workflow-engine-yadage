@@ -13,6 +13,7 @@ import json
 import logging
 import os
 
+from reana_commons.tasks import stop_workflow
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
