@@ -18,8 +18,8 @@ app = Celery('tasks', backend='rpc://',
              include=['reana_workflow_engine_yadage.tasks'])
 
 
-app.conf.update(CELERY_ACCEPT_CONTENT=['json'],
-                CELERY_TASK_SERIALIZER='json',
+app.conf.update(celery_accept_content=['json'],
+                celery_task_serializer='json',
                 broker_pool_limit=None)
 
 if __name__ == '__main__':
