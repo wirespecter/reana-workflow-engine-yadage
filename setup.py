@@ -53,7 +53,7 @@ install_requires = [
     'enum34>=1.1.6',
     'packtivity==0.10.0',
     'pyzmq==16.0.2',
-    'reana-commons>=0.4.0,<0.5.0',
+    'reana-commons>=0.5.0.dev20181126,<0.6.0',
     'requests==2.20.0',
     'SQLAlchemy-Utils>=0.32.18',
     'SQLAlchemy>=1.1.14',
