@@ -50,15 +50,20 @@ setup_requires = [
 install_requires = [
     'adage==0.8.5',
     'celery>=4.2.1,<4.3',
+    'click>=7,<8',
     'enum34>=1.1.6',
     'packtivity==0.10.0',
     'pyzmq==16.0.2',
+    'pyOpenSSL==17.5.0',  # FIXME remove once yadage-schemas solves deps.
     'reana-commons>=0.5.0.dev20181126,<0.6.0',
     'requests==2.20.0',
+    'rfc3987==1.3.7',  # FIXME remove once yadage-schemas solves deps.
+    'strict-rfc3339==0.7',  # FIXME remove once yadage-schemas solves deps.
     'SQLAlchemy-Utils>=0.32.18',
     'SQLAlchemy>=1.1.14',
     'yadage-schemas==0.7.16',
     'yadage==0.13.5',
+    'webcolors==1.7',  # FIXME remove once yadage-schemas solves deps.
 ]
 
 packages = find_packages()
@@ -83,6 +88,12 @@ setup(
     packages=['reana_workflow_engine_yadage', ],
     zip_safe=False,
     install_requires=install_requires,
+    entry_points={
+        'console_scripts': [
+            'run-yadage-workflow='
+            'reana_workflow_engine_yadage.tasks:run_yadage_workflow',
+        ]
+    },
     extras_require=extras_require,
     setup_requires=setup_requires,
     tests_require=tests_require,

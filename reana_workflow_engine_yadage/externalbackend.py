@@ -120,12 +120,12 @@ class ExternalBackend(object):
             image,
             wrapped_cmd,
             prettified_cmd,
-            current_app.current_worker_task.workflow_workspace,
+            os.getenv('workflow_workspace', 'default'),
             metadata['name'],)
 
         log.info('submitted job: %s', job_id)
         publisher.publish_workflow_status(
-            app.current_worker_task.workflow_uuid, 1,
+            os.getenv('workflow_uuid', 'default'), 1,
             message={"job_id": str(job_id).decode('utf-8')})
         return ExternalProxy(
             job_id=str(job_id),

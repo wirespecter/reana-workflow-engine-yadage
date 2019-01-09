@@ -13,11 +13,10 @@ import json
 import logging
 import os
 
-from reana_commons.tasks import stop_workflow
+import click
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
-from .celeryapp import app
 from .config import SHARED_VOLUME_PATH
 from .tracker import REANATracker
 from .utils import publisher
@@ -25,19 +24,40 @@ from .utils import publisher
 log = logging.getLogger(__name__)
 
 
-@app.task(name='tasks.run_yadage_workflow', ignore_result=True)
-def run_yadage_workflow(workflow_uuid, workflow_workspace,
-                        workflow=None, workflow_json=None,
-                        toplevel=os.getcwd(), parameters=None):
+def load_json(ctx, param, value):
+    """Serialize click option values."""
+    return json.loads(value)
+
+
+@click.command()
+@click.option('--workflow-uuid',
+              required=True,
+              help='UUID of workflow to be run.')
+@click.option('--workflow-workspace',
+              required=True,
+              help='Name of workspace in which workflow should run.')
+@click.option('--workflow-json',
+              help='JSON representation of workflow object to be run.',
+              callback=load_json)
+@click.option('--workflow-parameters',
+              help='JSON representation of workflow_parameters received by'
+                   ' the workflow.',
+              callback=load_json)
+def run_yadage_workflow(workflow_uuid,
+                        workflow_workspace,
+                        workflow_json=None,
+                        workflow_parameters=None):
     """Run a ``yadage`` workflow."""
     log.info('getting socket..')
     workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
                                           workflow_workspace)
     # use some shared object between tasks.
-    app.current_worker_task.workflow_uuid = workflow_uuid
-    app.current_worker_task.workflow_workspace = workflow_workspace
+    os.environ["workflow_uuid"] = workflow_uuid
+    os.environ["workflow_workspace"] = workflow_workspace
 
     cap_backend = setupbackend_fromstring('fromenv')
+    toplevel = os.getcwd()
+    workflow = None
 
     if workflow_json:
         # When `yadage` is launched using an already validated workflow file.
@@ -51,7 +71,8 @@ def run_yadage_workflow(workflow_uuid, workflow_workspace,
     try:
         with steering_ctx(dataarg=workflow_workspace,
                           dataopts=dataopts,
-                          initdata=parameters if parameters else {},
+                          initdata=workflow_parameters if workflow_parameters
+                          else {},
                           visualize=False,
                           updateinterval=5,
                           loginterval=5,
