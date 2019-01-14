@@ -9,6 +9,7 @@
 
 from __future__ import absolute_import, print_function
 
+import base64
 import json
 import logging
 import os
@@ -25,8 +26,9 @@ log = logging.getLogger(__name__)
 
 
 def load_json(ctx, param, value):
-    """Serialize click option values."""
-    return json.loads(value)
+    """Decode and load json for click option."""
+    value = value[1:]
+    return json.loads(base64.standard_b64decode(value).decode())
 
 
 @click.command()
