@@ -38,6 +38,7 @@ def submit(name, experiment, image, cmd, prettified_cmd):
         'env_vars': {},
         'workflow_workspace':
         current_app.current_worker_task.workflow_workspace,
+        'cvmfs_mounts': ["cms", "atlas", "alice", "lhcb"]
     }
 
     log.info('submitting %s', json.dumps(job_spec, indent=4, sort_keys=True))

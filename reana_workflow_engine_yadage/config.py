@@ -10,7 +10,7 @@
 
 import os
 
-SHARED_VOLUME_PATH = os.getenv('SHARED_VOLUME_PATH', '/reana/default')
+SHARED_VOLUME_PATH = os.getenv('SHARED_VOLUME_PATH', '/var/reana')
 """Path to the mounted REANA shared volume."""
 
 JOBCONTROLLER_HOST = os.getenv('JOBCONTROLLER_HOST',
