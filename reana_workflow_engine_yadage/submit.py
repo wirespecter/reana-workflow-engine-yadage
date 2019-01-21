@@ -13,7 +13,7 @@ import logging
 import requests
 from celery import current_app
 
-from .config import JOBCONTROLLER_HOST
+from .config import JOBCONTROLLER_HOST, MOUNT_CVMFS
 
 log = logging.getLogger('yadage.cap.submit')
 
@@ -38,8 +38,10 @@ def submit(name, experiment, image, cmd, prettified_cmd):
         'env_vars': {},
         'workflow_workspace':
         current_app.current_worker_task.workflow_workspace,
-        'cvmfs_mounts': ["cms", "atlas", "alice", "lhcb"]
+        'cvmfs_mounts': []
     }
+    if MOUNT_CVMFS:
+        job_spec['cvmfs_mounts'] = ["cms", "atlas", "alice", "lhcb"]
 
     log.info('submitting %s', json.dumps(job_spec, indent=4, sort_keys=True))
 

@@ -20,6 +20,7 @@ from packtivity.syncbackends import (build_job, contextualize_parameters,
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
 from .celeryapp import app
+from .config import MOUNT_CVMFS
 from .utils import REANAWorkflowStatusPublisher
 
 log = logging.getLogger('yadage.cap.externalproxy')
@@ -115,13 +116,18 @@ class ExternalBackend(object):
 
         log.info('submitting!')
 
-        job_id = self.rjc_api_client.submit(
+        job_request_body = [
             os.getenv('REANA_WORKFLOW_ENGINE_YADAGE_EXPERIMENT', 'default'),
             image,
             wrapped_cmd,
             prettified_cmd,
             os.getenv('workflow_workspace', 'default'),
-            metadata['name'],)
+            metadata['name']
+        ]
+        if MOUNT_CVMFS:
+            job_request_body.append(['cms', 'alice', 'atlas', 'lhcb'])
+
+        job_id = self.rjc_api_client.submit(*job_request_body)
 
         log.info('submitted job: %s', job_id)
         message = {"job_id": str(job_id).decode('utf-8')}
