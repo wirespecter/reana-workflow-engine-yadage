@@ -11,12 +11,11 @@ RUN dnf -y update && \
 
 RUN pip install --upgrade pip
 
-RUN pip install -e git://github.com/dinosk/reana-commons.git@131-support-for-cvmfs#egg=reana-commons
 COPY CHANGES.rst README.rst setup.py /code/
 COPY reana_workflow_engine_yadage/version.py /code/reana_workflow_engine_yadage/
 WORKDIR /code
-RUN pip install --no-cache-dir requirements-builder && \
-    requirements-builder -e all -l pypi setup.py | pip install --no-cache-dir -r /dev/stdin && \
+RUN pip install requirements-builder && \
+    requirements-builder -e all -l pypi setup.py | pip install -r /dev/stdin && \
     pip uninstall -y requirements-builder
 
 COPY . /code
