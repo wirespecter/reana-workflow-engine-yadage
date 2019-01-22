@@ -96,4 +96,9 @@ def run_yadage_workflow(workflow_uuid,
                      workflow_workspace=workflow_workspace))
     except Exception as e:
         log.info('workflow failed: {0}'.format(e))
-        publisher.publish_workflow_status(workflow_uuid, 3)
+        if publisher:
+            publisher.publish_workflow_status(workflow_uuid, 3)
+        else:
+            log.error('Workflow {workflow_uuid} failed but status '
+                      'could not be published.'.format(
+                          workflow_uuid=workflow_uuid))

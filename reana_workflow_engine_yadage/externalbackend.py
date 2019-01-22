@@ -124,10 +124,23 @@ class ExternalBackend(object):
             metadata['name'],)
 
         log.info('submitted job: %s', job_id)
-        publisher = REANAWorkflowStatusPublisher()
-        publisher.publish_workflow_status(
-            os.getenv('workflow_uuid', 'default'), 1,
-            message={"job_id": str(job_id).decode('utf-8')})
+        message = {"job_id": str(job_id).decode('utf-8')}
+        workflow_uuid = os.getenv('workflow_uuid', 'default')
+        status_running = 1
+        try:
+            publisher = REANAWorkflowStatusPublisher()
+            publisher.publish_workflow_status(
+                workflow_uuid, status_running,
+                message=message)
+        except Exception as e:
+            log.info('Status: workflow - {workflow_uuid} '
+                     'status - {status} message - {message}'.format(
+                         workflow_uuid=workflow_uuid,
+                         status=status_running,
+                         message=message
+                     ))
+            log.info('workflow status publish failed: {0}'.format(e))
+
         return ExternalProxy(
             job_id=str(job_id),
             spec=spec,

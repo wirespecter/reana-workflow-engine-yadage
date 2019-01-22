@@ -64,11 +64,13 @@ class REANATracker(object):
     def __init__(self, identifier=None):
         """Build the tracker object."""
         self.workflow_id = identifier
+        self.reana_status_publisher = None
         log.info('initializing REANA workflow tracker for id {}'.format(
             self.workflow_id))
 
     def initialize(self, adageobj):
         """Initialize the progress tracker."""
+        self.reana_status_publisher = REANAWorkflowStatusPublisher()
         self.track(adageobj)
 
     def track(self, adageobj):
@@ -117,11 +119,25 @@ class REANATracker(object):
                     {}
                     '''.format(self.workflow_id,
                                json.dumps(progress, indent=4), log_message))
-        publisher = REANAWorkflowStatusPublisher()
-        publisher.publish_workflow_status(
-            self.workflow_id, status=1, logs=log_message,
-            message={"progress": progress})
+        message = {"progress": progress}
+        status_running = 1
+        try:
+            self.reana_status_publisher.publish_workflow_status(
+                self.workflow_id, status=status_running, logs=log_message,
+                message={"progress": progress})
+        except Exception as e:
+            log.info('Status: workflow - {workflow_uuid} '
+                     'status - {status} message - {message} '
+                     'log - {log}'.format(
+                         workflow_uuid=self.workflow_id,
+                         status=status_running,
+                         message=message,
+                         log=log_message
+                     ))
+            log.info('workflow status publish failed: {0}'.format(e))
 
     def finalize(self, adageobj):
         """Finilizes the progress tracking."""
         self.track(adageobj)
+        if self.reana_status_publisher:
+            self.reana_status_publisher.close()
