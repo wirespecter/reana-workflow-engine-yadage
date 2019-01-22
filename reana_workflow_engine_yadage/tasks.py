@@ -20,7 +20,7 @@ from yadage.utils import setupbackend_fromstring
 
 from .config import SHARED_VOLUME_PATH
 from .tracker import REANATracker
-from .utils import publisher
+from .utils import REANAWorkflowStatusPublisher
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +71,7 @@ def run_yadage_workflow(workflow_uuid,
 
     dataopts = {'initdir': workflow_workspace}
     try:
+        publisher = REANAWorkflowStatusPublisher()
         with steering_ctx(dataarg=workflow_workspace,
                           dataopts=dataopts,
                           initdata=workflow_parameters if workflow_parameters

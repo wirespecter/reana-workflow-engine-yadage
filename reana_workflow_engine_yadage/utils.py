@@ -11,4 +11,15 @@ import json
 
 from reana_commons.publisher import WorkflowStatusPublisher
 
-publisher = WorkflowStatusPublisher()
+
+class REANAWorkflowStatusPublisher(object):
+    """REANA workflow status publisher singleton."""
+
+    __instance = None
+
+    def __new__(cls):
+        """REANA workflow status publisher object creation."""
+        if REANAWorkflowStatusPublisher.__instance is None:
+            REANAWorkflowStatusPublisher.__instance = \
+                WorkflowStatusPublisher()
+        return REANAWorkflowStatusPublisher.__instance

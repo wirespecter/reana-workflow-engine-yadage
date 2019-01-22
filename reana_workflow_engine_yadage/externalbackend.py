@@ -20,7 +20,7 @@ from packtivity.syncbackends import (build_job, contextualize_parameters,
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
 from .celeryapp import app
-from .utils import publisher
+from .utils import REANAWorkflowStatusPublisher
 
 log = logging.getLogger('yadage.cap.externalproxy')
 
@@ -124,6 +124,7 @@ class ExternalBackend(object):
             metadata['name'],)
 
         log.info('submitted job: %s', job_id)
+        publisher = REANAWorkflowStatusPublisher()
         publisher.publish_workflow_status(
             os.getenv('workflow_uuid', 'default'), 1,
             message={"job_id": str(job_id).decode('utf-8')})

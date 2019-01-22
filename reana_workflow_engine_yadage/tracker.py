@@ -18,7 +18,7 @@ import jq
 import networkx as nx
 from yadage.utils import WithJsonRefEncoder
 
-from .utils import publisher
+from .utils import REANAWorkflowStatusPublisher
 
 log = logging.getLogger(__name__)
 
@@ -117,6 +117,7 @@ class REANATracker(object):
                     {}
                     '''.format(self.workflow_id,
                                json.dumps(progress, indent=4), log_message))
+        publisher = REANAWorkflowStatusPublisher()
         publisher.publish_workflow_status(
             self.workflow_id, status=1, logs=log_message,
             message={"progress": progress})
