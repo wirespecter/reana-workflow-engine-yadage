@@ -122,10 +122,9 @@ class ExternalBackend(object):
             wrapped_cmd,
             prettified_cmd,
             os.getenv('workflow_workspace', 'default'),
-            metadata['name']
+            metadata['name'],
+            MOUNT_CVMFS
         ]
-        if MOUNT_CVMFS:
-            job_request_body.append(['cms', 'alice', 'atlas', 'lhcb'])
 
         job_id = self.rjc_api_client.submit(*job_request_body)
 
