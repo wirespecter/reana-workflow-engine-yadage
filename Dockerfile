@@ -5,9 +5,26 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 FROM fedora:25
-RUN dnf -y update && \
-    dnf install -y gcc gcc-c++ graphviz-devel ImageMagick python-devel libffi-devel openssl openssl-devel openssh-clients unzip nano autoconf automake libtool python-pip git &&\
-    dnf install -y dnf redhat-rpm-config
+RUN dnf update -y && \
+    dnf install -y \
+      ImageMagick \
+      autoconf \
+      automake \
+      gcc \
+      gcc-c++ \
+      git \
+      graphviz-devel \
+      libffi-devel \
+      libtool \
+      openssh-clients \
+      openssl \
+      openssl-devel \
+      python-devel \
+      python-pip \
+      unzip \
+      vim-minimal && \
+  dnf install -y dnf redhat-rpm-config && \
+  dnf clean all
 
 RUN pip install --upgrade pip
 
