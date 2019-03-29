@@ -116,7 +116,9 @@ class ExternalBackend(object):
 
         log.info('submitting!')
 
+        workflow_uuid = os.getenv('workflow_uuid', 'default')
         job_request_body = [
+            workflow_uuid,
             os.getenv('REANA_WORKFLOW_ENGINE_YADAGE_EXPERIMENT', 'default'),
             image,
             wrapped_cmd,
