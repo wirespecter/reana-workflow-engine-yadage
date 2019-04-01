@@ -20,10 +20,10 @@ from packtivity.syncbackends import (build_job, contextualize_parameters,
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
 from .celeryapp import app
-from .config import MOUNT_CVMFS
+from .config import LOGGING_MODULE, MOUNT_CVMFS
 from .utils import REANAWorkflowStatusPublisher
 
-log = logging.getLogger('yadage.cap.externalproxy')
+log = logging.getLogger(LOGGING_MODULE)
 
 
 def make_oneliner(job):

@@ -18,9 +18,10 @@ import jq
 import networkx as nx
 from yadage.utils import WithJsonRefEncoder
 
+from .config import LOGGING_MODULE
 from .utils import REANAWorkflowStatusPublisher
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(LOGGING_MODULE)
 
 
 def analyze_progress(adageobj):

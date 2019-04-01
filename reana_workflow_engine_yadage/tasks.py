@@ -15,14 +15,16 @@ import logging
 import os
 
 import click
+from reana_commons.config import REANA_LOG_FORMAT, REANA_LOG_LEVEL
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
-from .config import SHARED_VOLUME_PATH
+from .config import LOGGING_MODULE, SHARED_VOLUME_PATH
 from .tracker import REANATracker
 from .utils import REANAWorkflowStatusPublisher
 
-log = logging.getLogger(__name__)
+logging.basicConfig(level=REANA_LOG_LEVEL, format=REANA_LOG_FORMAT)
+log = logging.getLogger(LOGGING_MODULE)
 
 
 def load_json(ctx, param, value):
