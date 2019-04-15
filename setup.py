@@ -26,7 +26,7 @@ tests_require = [
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
-    'pytest>=2.8.0',
+    'pytest>=3.8.0',
 ]
 
 extras_require = {
@@ -50,7 +50,7 @@ setup_requires = [
 install_requires = [
     'adage==0.8.5',
     'celery>=4.1.0,<4.3',
-    'click>=7,<8',
+    'click>=7',
     'enum34>=1.1.6',
     'packtivity==0.10.0',
     'pyOpenSSL==17.5.0',  # FIXME remove once yadage-schemas solves deps.
