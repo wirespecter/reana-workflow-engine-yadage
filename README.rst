@@ -5,7 +5,7 @@
 .. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-yadage.svg
       :target: https://travis-ci.org/reanahub/reana-workflow-engine-yadage
 
-.. image:: https://readthedocs.org/projects/docs/badge/?version=latest
+.. image:: https://readthedocs.org/projects/reana-workflow-engine-yadage/badge/?version=latest
       :target: https://reana-workflow-engine-yadage.readthedocs.io/en/latest/?badge=latest
 
 .. image:: https://img.shields.io/coveralls/reanahub/reana-workflow-engine-yadage.svg
