@@ -16,6 +16,7 @@ import os
 
 import click
 from reana_commons.config import REANA_LOG_FORMAT, REANA_LOG_LEVEL
+from reana_commons.utils import check_connection_to_job_controller
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
@@ -73,6 +74,7 @@ def run_yadage_workflow(workflow_uuid,
 
     dataopts = {'initdir': workflow_workspace}
     try:
+        check_connection_to_job_controller()
         publisher = REANAWorkflowStatusPublisher()
         with steering_ctx(dataarg=workflow_workspace,
                           dataopts=dataopts,

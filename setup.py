@@ -54,7 +54,7 @@ install_requires = [
     'enum34>=1.1.6',
     'packtivity==0.10.0',
     'pyOpenSSL==17.5.0',  # FIXME remove once yadage-schemas solves deps.
-    'reana-commons>=0.5.0,<0.6.0',
+    'reana-commons>=0.6.0.dev20190619,<0.7.0',
     'requests==2.20.0',
     'rfc3987==1.3.7',  # FIXME remove once yadage-schemas solves deps.
     'strict-rfc3339==0.7',  # FIXME remove once yadage-schemas solves deps.
