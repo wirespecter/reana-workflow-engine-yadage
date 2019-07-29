@@ -13,13 +13,11 @@ import logging
 import os
 import pipes
 
-from celery import current_app
 from packtivity.asyncbackends import PacktivityProxyBase
 from packtivity.syncbackends import (build_job, contextualize_parameters,
                                      packconfig, publish)
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
-from .celeryapp import app
 from .config import LOGGING_MODULE, MOUNT_CVMFS
 from .utils import REANAWorkflowStatusPublisher
 

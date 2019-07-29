@@ -42,7 +42,6 @@ setup_requires = [
 
 install_requires = [
     'adage==0.8.5',
-    'celery>=4.1.0,<4.3',
     'click>=7',
     'enum34>=1.1.6',
     'packtivity==0.10.0',
@@ -83,7 +82,7 @@ setup(
     entry_points={
         'console_scripts': [
             'run-yadage-workflow='
-            'reana_workflow_engine_yadage.tasks:run_yadage_workflow',
+            'reana_workflow_engine_yadage.cli:run_yadage_workflow',
         ]
     },
     extras_require=extras_require,
