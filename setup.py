@@ -36,25 +36,32 @@ for key, reqs in extras_require.items():
         continue
     extras_require['all'].extend(reqs)
 
+
 setup_requires = [
     'pytest-runner>=2.7',
 ]
 
 install_requires = [
-    'adage==0.8.5',
+    'adage==0.10.0',  # FIXME remove once yadage-schemas solves yadage deps.
     'click>=7',
     'enum34>=1.1.6',
-    'packtivity==0.10.0',
-    'pyOpenSSL==17.5.0',  # FIXME remove once yadage-schemas solves deps.
+    'graphviz>=0.12',  # FIXME needed only if yadage visuale=True.
+    'jq==0.1.6',
+    'networkx==1.11',
+    'packtivity==0.14.21',
+    'pydot2>=1.0.33',  # FIXME needed only if yadage visuale=True.
+    'pydotplus>=2.0.2',  # FIXME needed only if yadage visuale=True.
+    'pygraphviz>=1.5',  # FIXME needed only if yadage visuale=True.
+    'pyOpenSSL==19.0.0',  # FIXME remove once yadage-schemas solves deps.
     'reana-commons>=0.6.0.dev20190812,<0.7.0',
-    'requests==2.20.0',
-    'rfc3987==1.3.7',  # FIXME remove once yadage-schemas solves deps.
+    'requests==2.22.0',
+    'rfc3987==1.3.8',  # FIXME remove once yadage-schemas solves yadage deps.
     'strict-rfc3339==0.7',  # FIXME remove once yadage-schemas solves deps.
     'SQLAlchemy-Utils>=0.32.18',
     'SQLAlchemy>=1.1.14',
-    'yadage-schemas==0.7.16',
-    'yadage==0.13.5',
-    'webcolors==1.7',  # FIXME remove once yadage-schemas solves deps.
+    'yadage==0.20.0',
+    'yadage-schemas==0.10.6',
+    'webcolors==1.9.1',  # FIXME remove once yadage-schemas solves yadage deps.
 ]
 
 packages = find_packages()
@@ -96,6 +103,8 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',

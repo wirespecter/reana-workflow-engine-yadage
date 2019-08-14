@@ -8,15 +8,14 @@
 """REANA-Workflow-Engine-yadage REANA packtivity backend."""
 
 import ast
-import base64
 import logging
 import os
 import pipes
 
 from packtivity.asyncbackends import PacktivityProxyBase
-from packtivity.syncbackends import (build_job, contextualize_parameters,
-                                     packconfig, publish)
-from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
+from packtivity.syncbackends import (build_job, finalize_inputs, packconfig,
+                                     publish)
+from reana_commons.api_client import JobControllerAPIClient as RJC_API_Client
 
 from .config import LOGGING_MODULE, MOUNT_CVMFS
 from .utils import REANAWorkflowStatusPublisher
@@ -24,25 +23,19 @@ from .utils import REANAWorkflowStatusPublisher
 log = logging.getLogger(LOGGING_MODULE)
 
 
-def make_oneliner(job):
-    """Convert a command into oneliner."""
-    wrapped_cmd = 'sh -c {}  '.format(
-        pipes.quote(job['command'])
-    )
-    return wrapped_cmd
+def get_commands(job):
+    """Convert a command/script into oneliner from its job."""
+    _prettified_cmd, _wrapped_cmd = None, None
 
+    if 'command' in job:
+        _prettified_cmd = job['command']
+        _wrapped_cmd = 'sh -c {}  '.format(pipes.quote(job['command']))
 
-def make_script(job):
-    """Encode script type commands in base64."""
-    encoded_script = base64.b64encode(job['script'])
-    cmd = 'echo {encoded}|base64 -d|{interpreter}'.format(
-            encoded=encoded_script,
-            interpreter=job['interpreter']
-    )
-    wrapped_cmd = 'sh -c {}  '.format(
-        pipes.quote(cmd)
-    )
-    return wrapped_cmd
+    elif 'script' in job:
+        _prettified_cmd = job['script']
+        _wrapped_cmd = 'sh -c {}  '.format(pipes.quote(job['script']))
+
+    return _prettified_cmd, _wrapped_cmd
 
 
 class ExternalProxy(PacktivityProxyBase):
@@ -50,6 +43,7 @@ class ExternalProxy(PacktivityProxyBase):
 
     def __init__(self, job_id, spec, pars, state):
         """Initialize yadage external proxy."""
+        super().__init__()
         self.job_id = job_id
         self.spec = spec
         self.pars = pars
@@ -57,14 +51,14 @@ class ExternalProxy(PacktivityProxyBase):
 
     def proxyname(self):
         """Return the proxy name."""
-        return 'ExternalProxy'
+        return 'ReanaExternalProxy'
 
     def details(self):
         """Retrieve the proxy details."""
         return {
             'job_id': self.job_id,
             'spec': self.spec,
-            'pars': self.pars,
+            'pars': self.pars.json(),
             'state': self.state.json(),
         }
 
@@ -85,24 +79,16 @@ class ExternalBackend(object):
     def __init__(self):
         """Initialize the REANA packtivity backend."""
         self.config = packconfig()
-        self.rjc_api_client = rjc_api_client('reana-job-controller')
+        self.rjc_api_client = RJC_API_Client('reana-job-controller')
 
-    def prepublish(self, spec, parameters, context):
-        """."""
-        return None
+        self._fail_info = None
 
     def submit(self, spec, parameters, state, metadata):
         """Submit a yadage packtivity to RJC."""
-        parameters = contextualize_parameters(parameters,
-                                              state)
+        parameters, state = finalize_inputs(parameters, state)
         job = build_job(spec['process'], parameters, state, self.config)
 
-        if 'command' in job:
-            prettified_cmd = job['command']
-            wrapped_cmd = make_oneliner(job)
-        elif 'script' in job:
-            prettified_cmd = job['script']
-            wrapped_cmd = make_script(job)
+        prettified_cmd, wrapped_cmd = get_commands(job)
 
         image = spec['environment']['image']
         # tag = spec['environment']['imagetag']
@@ -129,7 +115,7 @@ class ExternalBackend(object):
         job_id = self.rjc_api_client.submit(*job_request_body)
 
         log.info('submitted job: %s', job_id)
-        message = {"job_id": str(job_id).decode('utf-8')}
+        message = {"job_id": str(job_id)}
         workflow_uuid = os.getenv('workflow_uuid', 'default')
         status_running = 1
         try:
@@ -154,28 +140,34 @@ class ExternalBackend(object):
         )
 
     def result(self, resultproxy):
-        """Retrieve the result of a pactivity run by RJC."""
-        resultproxy.pars = contextualize_parameters(resultproxy.pars,
-                                                    resultproxy.state)
+        """Retrieve the result of a packtivity run by RJC."""
+        resultproxy.pars, resultproxy.state \
+            = finalize_inputs(resultproxy.pars, resultproxy.state)
+
+        self._fail_info = "Debug params are:\n rp:{} \n rpp:{}\n rps:{}"\
+            .format(resultproxy.details(), resultproxy.pars, resultproxy.state)
+
         return publish(
             resultproxy.spec['publisher'],
             resultproxy.pars, resultproxy.state, self.config
         )
 
+    def _get_state(self, resultproxy):
+        """Get the packtivity state."""
+        resultproxy = ast.literal_eval(resultproxy.job_id)
+        status_res = self.rjc_api_client.check_status(
+            resultproxy['job_id'])
+        return status_res['status']
+
     def ready(self, resultproxy):
         """Check if a packtivity is finished."""
-        resultproxy = ast.literal_eval(resultproxy.job_id)
-        status_res = self.rjc_api_client.check_status(
-            resultproxy['job_id'])
-        return status_res['status'] != 'started'
+        return self._get_state(resultproxy) != 'started'
 
     def successful(self, resultproxy):
-        """Check if the pactivity was successful."""
-        resultproxy = ast.literal_eval(resultproxy.job_id)
-        status_res = self.rjc_api_client.check_status(
-            resultproxy['job_id'])
-        return status_res['status'] == 'succeeded'
+        """Check if the packtivity was successful."""
+        return self._get_state(resultproxy) == 'succeeded'
 
     def fail_info(self, resultproxy):
-        """Retreive the fail info."""
-        pass
+        """Retrieve the fail info."""
+        self._fail_info += "\nraw info: {}".format(resultproxy)
+        return self._fail_info

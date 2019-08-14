@@ -83,6 +83,7 @@ class REANATracker(object):
 
         progress = {
             "engine_specific": None,
+            "planned": {"total": 0, "job_ids": []},
             "failed": {"total": 0, "job_ids": []},
             "total": {"total": 0, "job_ids": []},
             "running": {"total": 0, "job_ids": []},
@@ -108,9 +109,8 @@ class REANATracker(object):
                 if key in ['running', 'finished', 'failed']:
                     progress[key]['job_ids'].append(job_id)
 
-        log_message = 'this is a tracking log at {}'.format(
-            datetime.datetime.now().isoformat()
-        )
+        log_message = 'this is a tracking log at {}\n'\
+            .format(datetime.datetime.now().isoformat())
 
         log.info('''sending to REANA
                     uuid: {}
@@ -119,7 +119,8 @@ class REANATracker(object):
                     message:
                     {}
                     '''.format(self.workflow_id,
-                               json.dumps(progress, indent=4), log_message))
+                               json.dumps(progress, indent=4),
+                               log_message))
         message = {"progress": progress}
         status_running = 1
         try:
@@ -138,7 +139,8 @@ class REANATracker(object):
             log.info('workflow status publish failed: {0}'.format(e))
 
     def finalize(self, adageobj):
-        """Finilizes the progress tracking."""
+        """Finalize the progress tracking."""
         self.track(adageobj)
+        log.info("Finalizing the progress tracking for: {}".format(adageobj))
         if self.reana_status_publisher:
             self.reana_status_publisher.close()

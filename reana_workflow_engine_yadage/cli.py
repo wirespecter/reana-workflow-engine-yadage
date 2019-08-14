@@ -73,9 +73,12 @@ def run_yadage_workflow(workflow_uuid,
         workflow_kwargs = dict(workflow=workflow, toplevel=toplevel)
 
     dataopts = {'initdir': workflow_workspace}
+
     try:
+
         check_connection_to_job_controller()
         publisher = REANAWorkflowStatusPublisher()
+
         with steering_ctx(dataarg=workflow_workspace,
                           dataopts=dataopts,
                           initdata=workflow_parameters if workflow_parameters
@@ -101,7 +104,9 @@ def run_yadage_workflow(workflow_uuid,
     except Exception as e:
         log.info('workflow failed: {0}'.format(e))
         if publisher:
-            publisher.publish_workflow_status(workflow_uuid, 3)
+            publisher.publish_workflow_status(
+                workflow_uuid, 3, logs='workflow failed: {0}'.format(e)
+            )
         else:
             log.error('Workflow {workflow_uuid} failed but status '
                       'could not be published.'.format(
