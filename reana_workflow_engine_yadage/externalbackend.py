@@ -93,6 +93,16 @@ class ExternalBackend(object):
         image = spec['environment']['image']
         # tag = spec['environment']['imagetag']
 
+        kerberos = False
+        compute_backend = None
+        resources = spec['environment'].get('resources', None)
+        if resources:
+            for item in resources:
+                if 'kerberos' in item.keys():
+                    kerberos = item['kerberos']
+                if 'compute_backend' in item.keys():
+                    compute_backend = item['compute_backend']
+
         log.info('state context is %s', state)
         log.info('would run job %s', job)
 
@@ -101,18 +111,24 @@ class ExternalBackend(object):
         log.info('submitting!')
 
         workflow_uuid = os.getenv('workflow_uuid', 'default')
-        job_request_body = [
-            workflow_uuid,
-            os.getenv('REANA_WORKFLOW_ENGINE_YADAGE_EXPERIMENT', 'default'),
-            image,
-            wrapped_cmd,
-            prettified_cmd,
-            os.getenv('workflow_workspace', 'default'),
-            metadata['name'],
-            MOUNT_CVMFS
-        ]
+        job_request_body = {
+            'workflow_uuid': workflow_uuid,
+            'experiment': os.getenv('REANA_WORKFLOW_ENGINE_YADAGE_EXPERIMENT',
+                                    'default'),
+            'image': image,
+            'cmd': wrapped_cmd,
+            'prettified_cmd': prettified_cmd,
+            'workflow_workspace': os.getenv('workflow_workspace', 'default'),
+            'job_name': metadata['name'],
+            'cvmfs_mounts': MOUNT_CVMFS,
+        }
 
-        job_id = self.rjc_api_client.submit(*job_request_body)
+        if compute_backend:
+            job_request_body['compute_backend'] = compute_backend
+        if kerberos:
+            job_request_body['kerberos'] = kerberos
+
+        job_id = self.rjc_api_client.submit(**job_request_body)
 
         log.info('submitted job: %s', job_id)
         message = {"job_id": str(job_id)}
