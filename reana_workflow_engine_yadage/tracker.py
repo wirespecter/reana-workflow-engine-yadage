@@ -38,15 +38,18 @@ def analyze_progress(adageobj):
             continue
         if nodeobj.state == nodestate.RUNNING:
             nodestates.append(
-                {'state': 'running', 'job_id': nodeobj.resultproxy.job_id}
+                {'state': 'running',
+                 'job_id': nodeobj.resultproxy.jobproxy['job_id']}
             )
         elif dagstate.node_status(nodeobj):
             nodestates.append(
-                {'state': 'succeeded', 'job_id': nodeobj.resultproxy.job_id}
+                {'state': 'succeeded',
+                 'job_id': nodeobj.resultproxy.jobproxy['job_id']}
             )
         elif dagstate.node_ran_and_failed(nodeobj):
             nodestates.append(
-                {'state': 'failed', 'job_id': nodeobj.resultproxy.job_id}
+                {'state': 'failed',
+                 'job_id': nodeobj.resultproxy.jobproxy['job_id']}
             )
         elif dagstate.upstream_failure(dag, nodeobj):
             nodestates.append(
@@ -92,7 +95,7 @@ class REANATracker(object):
 
         progress['engine_specific'] = jq.jq('{dag: {edges: .dag.edges, nodes: \
         [.dag.nodes[]|{metadata: {name: .task.metadata.name}, id: .id, \
-        jobid: .proxy.proxydetails.job_id}]}}').transform(purejson)
+        jobid: .proxy.proxydetails.jobproxy}]}}').transform(purejson)
 
         for node in analyze_progress(adageobj):
             key = {
@@ -103,13 +106,12 @@ class REANATracker(object):
                 'scheduled': 'total',
             }[node['state']]
             progress[key]['total'] += 1
-            if isinstance(node['job_id'], str):
-                job_id_dict = ast.literal_eval(node['job_id'])
-                job_id = job_id_dict['job_id']
-                if key in ['running', 'finished', 'failed']:
-                    progress[key]['job_ids'].append(job_id)
 
-        log_message = 'this is a tracking log at {}\n'\
+            job_id = node['job_id']
+            if key in ['running', 'finished', 'failed']:
+                progress[key]['job_ids'].append(job_id)
+
+        log_message = 'this is a tracking log at {0}'\
             .format(datetime.datetime.now().isoformat())
 
         log.info('''sending to REANA

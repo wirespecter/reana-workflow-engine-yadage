@@ -7,12 +7,11 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 """REANA-Workflow-Engine-yadage REANA packtivity backend."""
 
-import ast
 import logging
 import os
 import pipes
 
-from packtivity.asyncbackends import PacktivityProxyBase
+from packtivity.asyncbackends import ExternalAsyncProxy
 from packtivity.syncbackends import (build_job, finalize_inputs, packconfig,
                                      publish)
 from reana_commons.api_client import JobControllerAPIClient as RJC_API_Client
@@ -38,39 +37,18 @@ def get_commands(job):
     return _prettified_cmd, _wrapped_cmd
 
 
-class ExternalProxy(PacktivityProxyBase):
+class ReanaExternalProxy(ExternalAsyncProxy):
     """REANA yadage external proxy."""
 
-    def __init__(self, job_id, spec, pars, state):
-        """Initialize yadage external proxy."""
-        super().__init__()
-        self.job_id = job_id
-        self.spec = spec
-        self.pars = pars
-        self.state = state
-
-    def proxyname(self):
-        """Return the proxy name."""
-        return 'ReanaExternalProxy'
-
     def details(self):
-        """Retrieve the proxy details."""
+        """Parse details to json format."""
         return {
-            'job_id': self.job_id,
-            'spec': self.spec,
-            'pars': self.pars.json(),
-            'state': self.state.json(),
+            "resultdata": self.resultdata,
+            "jobproxy": self.jobproxy,
+            "spec": self.spec,
+            "statedata": self.statedata.json(),
+            "pardata": self.pardata.json(),
         }
-
-    @classmethod
-    def fromJSON(cls, data):
-        """Retrieve proxy details from JSON."""
-        return cls(
-            data['proxydetails']['job_id'],
-            data['proxydetails']['spec'],
-            data['proxydetails']['pars'],
-            data['proxydetails']['state']
-        )
 
 
 class ExternalBackend(object):
@@ -103,8 +81,8 @@ class ExternalBackend(object):
                 if 'compute_backend' in item.keys():
                     compute_backend = item['compute_backend']
 
-        log.info('state context is %s', state)
-        log.info('would run job %s', job)
+        log.info('state context is {0}'.format(state))
+        log.info('would run job {0}'.format(job))
 
         state.ensure()
 
@@ -130,7 +108,7 @@ class ExternalBackend(object):
 
         job_id = self.rjc_api_client.submit(**job_request_body)
 
-        log.info('submitted job: %s', job_id)
+        log.info('submitted job:{0}'.format(job_id))
         message = {"job_id": str(job_id)}
         workflow_uuid = os.getenv('workflow_uuid', 'default')
         status_running = 1
@@ -148,31 +126,27 @@ class ExternalBackend(object):
                      ))
             log.info('workflow status publish failed: {0}'.format(e))
 
-        return ExternalProxy(
-            job_id=str(job_id),
+        return ReanaExternalProxy(
+            jobproxy=job_id,
             spec=spec,
-            pars=parameters,
-            state=state
+            pardata=parameters,
+            statedata=state
         )
 
     def result(self, resultproxy):
         """Retrieve the result of a packtivity run by RJC."""
-        resultproxy.pars, resultproxy.state \
-            = finalize_inputs(resultproxy.pars, resultproxy.state)
-
-        self._fail_info = "Debug params are:\n rp:{} \n rpp:{}\n rps:{}"\
-            .format(resultproxy.details(), resultproxy.pars, resultproxy.state)
+        resultproxy.pardata, resultproxy.statedata \
+            = finalize_inputs(resultproxy.pardata, resultproxy.statedata)
 
         return publish(
             resultproxy.spec['publisher'],
-            resultproxy.pars, resultproxy.state, self.config
+            resultproxy.pardata, resultproxy.statedata, self.config
         )
 
     def _get_state(self, resultproxy):
         """Get the packtivity state."""
-        resultproxy = ast.literal_eval(resultproxy.job_id)
         status_res = self.rjc_api_client.check_status(
-            resultproxy['job_id'])
+            resultproxy.jobproxy['job_id'])
         return status_res['status']
 
     def ready(self, resultproxy):
