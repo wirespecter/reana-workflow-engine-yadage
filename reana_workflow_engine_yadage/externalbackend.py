@@ -84,8 +84,9 @@ class ExternalBackend(object):
         image = spec['environment']['image']
         # tag = spec['environment']['imagetag']
 
-        kerberos = False
+        kerberos = None
         compute_backend = None
+        kubernetes_uid = None
         resources = spec['environment'].get('resources', None)
         if resources:
             for item in resources:
@@ -93,6 +94,8 @@ class ExternalBackend(object):
                     kerberos = item['kerberos']
                 if 'compute_backend' in item.keys():
                     compute_backend = item['compute_backend']
+                if 'kubernetes_uid' in item.keys():
+                    kubernetes_uid = item['kubernetes_uid']
 
         log.info('state context is {0}'.format(state))
         log.info('would run job {0}'.format(job))
@@ -104,8 +107,6 @@ class ExternalBackend(object):
         workflow_uuid = os.getenv('workflow_uuid', 'default')
         job_request_body = {
             'workflow_uuid': workflow_uuid,
-            'experiment': os.getenv('REANA_WORKFLOW_ENGINE_YADAGE_EXPERIMENT',
-                                    'default'),
             'image': image,
             'cmd': wrapped_cmd,
             'prettified_cmd': prettified_cmd,
@@ -118,6 +119,8 @@ class ExternalBackend(object):
             job_request_body['compute_backend'] = compute_backend
         if kerberos:
             job_request_body['kerberos'] = kerberos
+        if kubernetes_uid:
+            job_request_body['kubernetes_uid'] = kubernetes_uid
 
         job_id = self.rjc_api_client.submit(**job_request_body)
 
