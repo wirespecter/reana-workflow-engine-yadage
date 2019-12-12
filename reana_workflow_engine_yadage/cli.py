@@ -15,7 +15,8 @@ import logging
 import os
 
 import click
-from reana_commons.config import REANA_LOG_FORMAT, REANA_LOG_LEVEL
+from reana_commons.config import (REANA_LOG_FORMAT, REANA_LOG_LEVEL,
+                                  REANA_WORKFLOW_UMASK)
 from reana_commons.utils import check_connection_to_job_controller
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
@@ -59,6 +60,7 @@ def run_yadage_workflow(workflow_uuid,
     # use some shared object between tasks.
     os.environ["workflow_uuid"] = workflow_uuid
     os.environ["workflow_workspace"] = workflow_workspace
+    os.umask(REANA_WORKFLOW_UMASK)
 
     cap_backend = setupbackend_fromstring('fromenv')
     toplevel = os.getcwd()
