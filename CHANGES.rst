@@ -1,6 +1,19 @@
 Changes
 =======
 
+Version 0.6.0 (2019-12-20)
+--------------------------
+
+- Allows to specify compute backend (HTCondor, Kubernetes or Slurm) and
+  Kerberos authentication requirement for Yadage workflow jobs.
+- Upgrades Python to 3.6.
+- Upgrades Yadage to 0.20.0.
+- Upgrades Packtivity to 0.14.21.
+- Sets default umask 002 for jobs writing to the workflow workspace.
+- Allows setting UID for the job container runtime user.
+- Moves workflow engine to the same Kubernetes pod with the REANA-Job-Controller
+  (sidecar pattern).
+
 Version 0.5.0 (2019-04-23)
 --------------------------
 
