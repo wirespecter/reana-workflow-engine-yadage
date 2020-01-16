@@ -15,6 +15,7 @@ import logging
 import os
 
 import click
+import yadageschemas
 from reana_commons.config import (REANA_LOG_FORMAT, REANA_LOG_LEVEL,
                                   REANA_WORKFLOW_UMASK)
 from reana_commons.utils import check_connection_to_job_controller
@@ -45,6 +46,9 @@ def load_json(ctx, param, value):
 @click.option('--workflow-json',
               help='JSON representation of workflow object to be run.',
               callback=load_json)
+@click.option('--workflow-file',
+              help='Path to the workflow file. This field is used when'
+                   ' no workflow JSON has been passed.')
 @click.option('--workflow-parameters',
               help='JSON representation of workflow_parameters received by'
                    ' the workflow.',
@@ -52,6 +56,7 @@ def load_json(ctx, param, value):
 def run_yadage_workflow(workflow_uuid,
                         workflow_workspace,
                         workflow_json=None,
+                        workflow_file=None,
                         workflow_parameters=None):
     """Run a ``yadage`` workflow."""
     log.info('getting socket..')
@@ -73,6 +78,28 @@ def run_yadage_workflow(workflow_uuid,
         # When `yadage` resolves the workflow file from a remote repository:
         # i.e. github:reanahub/reana-demo-root6-roofit/workflow.yaml
         workflow_kwargs = dict(workflow=workflow, toplevel=toplevel)
+    elif workflow_file:
+        workflow_file_abs_path = os.path.join(
+            workflow_workspace, workflow_file)
+        if os.path.exists(workflow_file_abs_path):
+            schema_name = 'yadage/workflow-schema'
+            schemadir = None
+
+            specopts = {
+                'toplevel': workflow_workspace,
+                'schema_name': schema_name,
+                'schemadir': schemadir,
+                'load_as_ref': False,
+            }
+
+            validopts = {
+                'schema_name': schema_name,
+                'schemadir': schemadir,
+            }
+            workflow_json = yadageschemas.load(
+                spec=workflow_file, specopts=specopts, validopts=validopts,
+                validate=True)
+            workflow_kwargs = dict(workflow_json=workflow_json)
 
     dataopts = {'initdir': workflow_workspace}
 
