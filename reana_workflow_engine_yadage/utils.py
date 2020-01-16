@@ -7,8 +7,6 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 """REANA-Workflow-Engine-yadage utility functions."""
 
-import json
-
 from reana_commons.publisher import WorkflowStatusPublisher
 
 

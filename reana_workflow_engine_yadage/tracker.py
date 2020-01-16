@@ -127,18 +127,18 @@ class REANATracker(object):
         status_running = 1
         try:
             self.reana_status_publisher.publish_workflow_status(
-                self.workflow_id, status=status_running, logs=log_message,
+                self.workflow_id, status=status_running, logs=None,
                 message={"progress": progress})
         except Exception as e:
-            log.info('Status: workflow - {workflow_uuid} '
-                     'status - {status} message - {message} '
-                     'log - {log}'.format(
+            log.error('Status: workflow - {workflow_uuid} '
+                      'status - {status} message - {message} '
+                      'log - {log}'.format(
                          workflow_uuid=self.workflow_id,
                          status=status_running,
                          message=message,
                          log=log_message
-                     ))
-            log.info('workflow status publish failed: {0}'.format(e))
+                      ))
+            log.error('workflow status publish failed: {0}'.format(e))
 
     def finalize(self, adageobj):
         """Finalize the progress tracking."""
