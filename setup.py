@@ -42,7 +42,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'adage==0.10.0',  # FIXME remove once yadage-schemas solves yadage deps.
+    'adage==0.10.1',  # FIXME remove once yadage-schemas solves yadage deps.
     'click>=7',
     'enum34>=1.1.6',
     'graphviz>=0.12',  # FIXME needed only if yadage visuale=True.
@@ -59,7 +59,7 @@ install_requires = [
     'strict-rfc3339==0.7',  # FIXME remove once yadage-schemas solves deps.
     'SQLAlchemy-Utils>=0.32.18',
     'SQLAlchemy>=1.1.14',
-    'yadage==0.20.0',
+    'yadage==0.20.1',
     'yadage-schemas==0.10.6',
     'webcolors==1.9.1',  # FIXME remove once yadage-schemas solves yadage deps.
 ]
