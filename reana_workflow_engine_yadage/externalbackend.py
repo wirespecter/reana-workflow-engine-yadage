@@ -82,7 +82,9 @@ class ExternalBackend(object):
             wrapped_cmd = make_script(job)
 
         image = spec['environment']['image']
-        # tag = spec['environment']['imagetag']
+        imagetag = spec['environment'].get('imagetag', '')
+        if imagetag:
+            image = image + ":" + imagetag
 
         kerberos = None
         compute_backend = None
