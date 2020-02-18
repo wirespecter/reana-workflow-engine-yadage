@@ -12,6 +12,7 @@ RUN apt-get update && \
       autoconf \
       automake \
       gcc \
+      graphviz \
       graphviz-dev \
       imagemagick \
       libffi-dev \

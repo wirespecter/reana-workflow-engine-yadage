@@ -112,7 +112,7 @@ def run_yadage_workflow(workflow_uuid,
                           dataopts=dataopts,
                           initdata=workflow_parameters if workflow_parameters
                           else {},
-                          visualize=False,
+                          visualize=True,
                           updateinterval=5,
                           loginterval=5,
                           backend=cap_backend,
@@ -131,7 +131,7 @@ def run_yadage_workflow(workflow_uuid,
                      workflow_uuid=workflow_uuid,
                      workflow_workspace=workflow_workspace))
     except Exception as e:
-        log.info('workflow failed: {0}'.format(e))
+        log.info('workflow failed: {0}'.format(e), exc_info=True)
         if publisher:
             publisher.publish_workflow_status(
                 workflow_uuid, 3, logs='workflow failed: {0}'.format(e)
