@@ -89,6 +89,7 @@ class ExternalBackend(object):
         kerberos = None
         compute_backend = None
         kubernetes_uid = None
+        unpacked_img = None
         resources = spec['environment'].get('resources', None)
         if resources:
             for item in resources:
@@ -98,6 +99,8 @@ class ExternalBackend(object):
                     compute_backend = item['compute_backend']
                 if 'kubernetes_uid' in item.keys():
                     kubernetes_uid = item['kubernetes_uid']
+                if 'unpacked_img' in item.keys():
+                    unpacked_img = item['unpacked_img']
 
         log.info('state context is {0}'.format(state))
         log.info('would run job {0}'.format(job))
@@ -123,6 +126,8 @@ class ExternalBackend(object):
             job_request_body['kerberos'] = kerberos
         if kubernetes_uid:
             job_request_body['kubernetes_uid'] = kubernetes_uid
+        if unpacked_img:
+            job_request_body['unpacked_img'] = unpacked_img
 
         job_id = self.rjc_api_client.submit(**job_request_body)
 
