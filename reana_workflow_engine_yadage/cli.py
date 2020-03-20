@@ -17,12 +17,12 @@ import os
 import click
 import yadageschemas
 from reana_commons.config import (REANA_LOG_FORMAT, REANA_LOG_LEVEL,
-                                  REANA_WORKFLOW_UMASK)
+                                  REANA_WORKFLOW_UMASK, SHARED_VOLUME_PATH)
 from reana_commons.utils import check_connection_to_job_controller
 from yadage.steering_api import steering_ctx
 from yadage.utils import setupbackend_fromstring
 
-from .config import LOGGING_MODULE, SHARED_VOLUME_PATH
+from .config import LOGGING_MODULE
 from .tracker import REANATracker
 from .utils import REANAWorkflowStatusPublisher
 
