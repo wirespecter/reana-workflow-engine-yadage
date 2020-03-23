@@ -36,6 +36,22 @@ def load_json(ctx, param, value):
     return json.loads(base64.standard_b64decode(value).decode())
 
 
+def load_yadage_operational_options(ctx, param, operational_options):
+    """Decode and prepare operational options."""
+    operational_options = load_json(ctx, param, operational_options)
+    workflow_workspace = ctx.params.get('workflow_workspace')
+    workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
+                                          workflow_workspace)
+    toplevel = operational_options.get('toplevel', '')
+    if not toplevel.startswith('github:'):
+        toplevel = os.path.join(workflow_workspace, toplevel)
+    operational_options['toplevel'] = toplevel
+
+    operational_options['initdir'] = os.path.join(
+        workflow_workspace, operational_options.get('initdir', ''))
+    return operational_options
+
+
 @click.command()
 @click.option('--workflow-uuid',
               required=True,
@@ -43,21 +59,23 @@ def load_json(ctx, param, value):
 @click.option('--workflow-workspace',
               required=True,
               help='Name of workspace in which workflow should run.')
-@click.option('--workflow-json',
-              help='JSON representation of workflow object to be run.',
-              callback=load_json)
 @click.option('--workflow-file',
+              required=True,
               help='Path to the workflow file. This field is used when'
                    ' no workflow JSON has been passed.')
 @click.option('--workflow-parameters',
               help='JSON representation of workflow_parameters received by'
                    ' the workflow.',
               callback=load_json)
+@click.option('--operational-options',
+              help='Options to be passed to the workflow engine'
+                   ' (e.g. initdir).',
+              callback=load_yadage_operational_options)
 def run_yadage_workflow(workflow_uuid,
                         workflow_workspace,
-                        workflow_json=None,
-                        workflow_file=None,
-                        workflow_parameters=None):
+                        workflow_file,
+                        workflow_parameters=None,
+                        operational_options={}):
     """Run a ``yadage`` workflow."""
     log.info('getting socket..')
     workflow_workspace = '{0}/{1}'.format(SHARED_VOLUME_PATH,
@@ -68,25 +86,17 @@ def run_yadage_workflow(workflow_uuid,
     os.umask(REANA_WORKFLOW_UMASK)
 
     cap_backend = setupbackend_fromstring('fromenv')
-    toplevel = os.getcwd()
-    workflow = None
-
-    if workflow_json:
-        # When `yadage` is launched using an already validated workflow file.
-        workflow_kwargs = dict(workflow_json=workflow_json)
-    elif workflow:
-        # When `yadage` resolves the workflow file from a remote repository:
-        # i.e. github:reanahub/reana-demo-root6-roofit/workflow.yaml
-        workflow_kwargs = dict(workflow=workflow, toplevel=toplevel)
-    elif workflow_file:
-        workflow_file_abs_path = os.path.join(
-            workflow_workspace, workflow_file)
-        if os.path.exists(workflow_file_abs_path):
+    workflow_file_abs_path = os.path.join(workflow_workspace, workflow_file)
+    publisher = REANAWorkflowStatusPublisher()
+    try:
+        if not os.path.exists(workflow_file_abs_path):
+            message = f'Workflow file {workflow_file} does not exist'
+            raise Exception(message)
+        else:
             schema_name = 'yadage/workflow-schema'
             schemadir = None
-
             specopts = {
-                'toplevel': workflow_workspace,
+                'toplevel': operational_options['toplevel'],
                 'schema_name': schema_name,
                 'schemadir': schemadir,
                 'load_as_ref': False,
@@ -100,13 +110,8 @@ def run_yadage_workflow(workflow_uuid,
                 spec=workflow_file, specopts=specopts, validopts=validopts,
                 validate=True)
             workflow_kwargs = dict(workflow_json=workflow_json)
-
-    dataopts = {'initdir': workflow_workspace}
-
-    try:
-
+        dataopts = {'initdir': operational_options['initdir']}
         check_connection_to_job_controller()
-        publisher = REANAWorkflowStatusPublisher()
 
         with steering_ctx(dataarg=workflow_workspace,
                           dataopts=dataopts,
@@ -131,7 +136,7 @@ def run_yadage_workflow(workflow_uuid,
                      workflow_uuid=workflow_uuid,
                      workflow_workspace=workflow_workspace))
     except Exception as e:
-        log.info('workflow failed: {0}'.format(e), exc_info=True)
+        log.error('Workflow failed: {0}'.format(e), exc_info=True)
         if publisher:
             publisher.publish_workflow_status(
                 workflow_uuid, 3, logs='workflow failed: {0}'.format(e)
