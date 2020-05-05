@@ -90,6 +90,7 @@ class ExternalBackend(object):
         compute_backend = None
         kubernetes_uid = None
         unpacked_img = None
+        voms_proxy = None
         resources = spec['environment'].get('resources', None)
         if resources:
             for item in resources:
@@ -101,6 +102,8 @@ class ExternalBackend(object):
                     kubernetes_uid = item['kubernetes_uid']
                 if 'unpacked_img' in item.keys():
                     unpacked_img = item['unpacked_img']
+                if 'voms_proxy' in item.keys():
+                    voms_proxy = item['voms_proxy']
 
         log.info('state context is {0}'.format(state))
         log.info('would run job {0}'.format(job))
@@ -128,6 +131,8 @@ class ExternalBackend(object):
             job_request_body['kubernetes_uid'] = kubernetes_uid
         if unpacked_img:
             job_request_body['unpacked_img'] = unpacked_img
+        if voms_proxy:
+            job_request_body['voms_proxy'] = voms_proxy
 
         job_id = self.rjc_api_client.submit(**job_request_body)
 
