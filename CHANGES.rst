@@ -1,6 +1,16 @@
 Changes
 =======
 
+Version master (UNRELEASED)
+---------------------------
+
+- Upgrades to Yadage 0.20.1.
+- Creates workflow visualisation graph by default.
+- Allows specifying unpacked Docker images as workflow step requirement.
+- Performs workflow specification load logic. Before in ``reana-client``.
+- Adds VOMS proxy support as a new authentication method.
+- Add Black formatter support.
+
 Version 0.6.0 (2019-12-20)
 --------------------------
 
