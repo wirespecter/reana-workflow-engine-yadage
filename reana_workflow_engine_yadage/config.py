@@ -10,7 +10,7 @@
 
 import os
 
-MOUNT_CVMFS = os.getenv('REANA_MOUNT_CVMFS', 'false')
+MOUNT_CVMFS = os.getenv("REANA_MOUNT_CVMFS", "false")
 
-LOGGING_MODULE = 'reana-workflow-engine-yadage'
+LOGGING_MODULE = "reana-workflow-engine-yadage"
 """REANA Workflow Engine Yadage logging module."""

@@ -32,33 +32,27 @@ def analyze_progress(adageobj):
     nodestates = []
     for node in nx.topological_sort(dag):
         nodeobj = dag.getNode(node)
-        is_pure_publishing = nodeobj.task.metadata['wflow_hints'].get(
-            'is_purepub', False)
+        is_pure_publishing = nodeobj.task.metadata["wflow_hints"].get(
+            "is_purepub", False
+        )
         if is_pure_publishing:
             continue
         if nodeobj.state == nodestate.RUNNING:
             nodestates.append(
-                {'state': 'running',
-                 'job_id': nodeobj.resultproxy.jobproxy['job_id']}
+                {"state": "running", "job_id": nodeobj.resultproxy.jobproxy["job_id"]}
             )
         elif dagstate.node_status(nodeobj):
             nodestates.append(
-                {'state': 'succeeded',
-                 'job_id': nodeobj.resultproxy.jobproxy['job_id']}
+                {"state": "succeeded", "job_id": nodeobj.resultproxy.jobproxy["job_id"]}
             )
         elif dagstate.node_ran_and_failed(nodeobj):
             nodestates.append(
-                {'state': 'failed',
-                 'job_id': nodeobj.resultproxy.jobproxy['job_id']}
+                {"state": "failed", "job_id": nodeobj.resultproxy.jobproxy["job_id"]}
             )
         elif dagstate.upstream_failure(dag, nodeobj):
-            nodestates.append(
-                {'state': 'unsubmittable', 'job_id': None}
-            )
+            nodestates.append({"state": "unsubmittable", "job_id": None})
         else:
-            nodestates.append(
-                {'state': 'scheduled', 'job_id': None}
-            )
+            nodestates.append({"state": "scheduled", "job_id": None})
     return nodestates
 
 
@@ -69,8 +63,9 @@ class REANATracker(object):
         """Build the tracker object."""
         self.workflow_id = identifier
         self.reana_status_publisher = None
-        log.info('initializing REANA workflow tracker for id {}'.format(
-            self.workflow_id))
+        log.info(
+            "initializing REANA workflow tracker for id {}".format(self.workflow_id)
+        )
 
     def initialize(self, adageobj):
         """Initialize the progress tracker."""
@@ -79,9 +74,8 @@ class REANATracker(object):
 
     def track(self, adageobj):
         """Tracks progress."""
-        log.info('sending progress information')
-        serialized = json.dumps(adageobj.json(), cls=WithJsonRefEncoder,
-                                sort_keys=True)
+        log.info("sending progress information")
+        serialized = json.dumps(adageobj.json(), cls=WithJsonRefEncoder, sort_keys=True)
         purejson = json.loads(serialized)
 
         progress = {
@@ -90,55 +84,65 @@ class REANATracker(object):
             "failed": {"total": 0, "job_ids": []},
             "total": {"total": 0, "job_ids": []},
             "running": {"total": 0, "job_ids": []},
-            "finished": {"total": 0, "job_ids": []}
+            "finished": {"total": 0, "job_ids": []},
         }
 
-        progress['engine_specific'] = jq.jq('{dag: {edges: .dag.edges, nodes: \
+        progress["engine_specific"] = jq.jq(
+            "{dag: {edges: .dag.edges, nodes: \
         [.dag.nodes[]|{metadata: {name: .task.metadata.name}, id: .id, \
-        jobid: .proxy.proxydetails.jobproxy}]}}').transform(purejson)
+        jobid: .proxy.proxydetails.jobproxy}]}}"
+        ).transform(purejson)
 
         for node in analyze_progress(adageobj):
             key = {
-                'running': 'running',
-                'succeeded': 'finished',
-                'failed': 'failed',
-                'unsubmittable': 'planned',
-                'scheduled': 'total',
-            }[node['state']]
-            progress[key]['total'] += 1
+                "running": "running",
+                "succeeded": "finished",
+                "failed": "failed",
+                "unsubmittable": "planned",
+                "scheduled": "total",
+            }[node["state"]]
+            progress[key]["total"] += 1
 
-            job_id = node['job_id']
-            if key in ['running', 'finished', 'failed']:
-                progress[key]['job_ids'].append(job_id)
+            job_id = node["job_id"]
+            if key in ["running", "finished", "failed"]:
+                progress[key]["job_ids"].append(job_id)
 
-        log_message = 'this is a tracking log at {0}'\
-            .format(datetime.datetime.now().isoformat())
+        log_message = "this is a tracking log at {0}".format(
+            datetime.datetime.now().isoformat()
+        )
 
-        log.info('''sending to REANA
+        log.info(
+            """sending to REANA
                     uuid: {}
                     json:
                     {}
                     message:
                     {}
-                    '''.format(self.workflow_id,
-                               json.dumps(progress, indent=4),
-                               log_message))
+                    """.format(
+                self.workflow_id, json.dumps(progress, indent=4), log_message
+            )
+        )
         message = {"progress": progress}
         status_running = 1
         try:
             self.reana_status_publisher.publish_workflow_status(
-                self.workflow_id, status=status_running, logs=None,
-                message={"progress": progress})
+                self.workflow_id,
+                status=status_running,
+                logs=None,
+                message={"progress": progress},
+            )
         except Exception as e:
-            log.error('Status: workflow - {workflow_uuid} '
-                      'status - {status} message - {message} '
-                      'log - {log}'.format(
-                         workflow_uuid=self.workflow_id,
-                         status=status_running,
-                         message=message,
-                         log=log_message
-                      ))
-            log.error('workflow status publish failed: {0}'.format(e))
+            log.error(
+                "Status: workflow - {workflow_uuid} "
+                "status - {status} message - {message} "
+                "log - {log}".format(
+                    workflow_uuid=self.workflow_id,
+                    status=status_running,
+                    message=message,
+                    log=log_message,
+                )
+            )
+            log.error("workflow status publish failed: {0}".format(e))
 
     def finalize(self, adageobj):
         """Finalize the progress tracking."""
