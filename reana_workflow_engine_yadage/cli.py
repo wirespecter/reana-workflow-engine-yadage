@@ -13,6 +13,7 @@ import base64
 import json
 import logging
 import os
+import yaml
 
 import click
 import yadageschemas
@@ -53,6 +54,12 @@ def load_yadage_operational_options(ctx, param, operational_options):
     operational_options["initdir"] = os.path.join(
         workflow_workspace, operational_options.get("initdir", "")
     )
+
+    operational_options["initfiles"] = [
+        os.path.join(workflow_workspace, initfile)
+        for initfile in operational_options.get("initfiles", [])
+    ]
+
     return operational_options
 
 
@@ -123,12 +130,18 @@ def run_yadage_workflow(
             )
             workflow_kwargs = dict(workflow_json=workflow_json)
         dataopts = {"initdir": operational_options["initdir"]}
+
+        initdata = {}
+        for initfile in operational_options["initfiles"]:
+            initdata.update(**yaml.safe_load(open(initfile)))
+        initdata.update(workflow_parameters)
+
         check_connection_to_job_controller()
 
         with steering_ctx(
             dataarg=workflow_workspace,
             dataopts=dataopts,
-            initdata=workflow_parameters if workflow_parameters else {},
+            initdata=initdata,
             visualize=True,
             updateinterval=5,
             loginterval=5,

@@ -10,6 +10,7 @@ Version master (UNRELEASED)
 - Performs workflow specification load logic. Before in ``reana-client``.
 - Adds VOMS proxy support as a new authentication method.
 - Add Black formatter support.
+- Adds initfiles as an operational option for Yadage.
 
 Version 0.6.1 (2020-05-25)
 --------------------------

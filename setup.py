@@ -59,6 +59,7 @@ install_requires = [
     "yadage==0.20.1",
     "yadage-schemas==0.10.6",
     "webcolors==1.9.1",  # FIXME remove once yadage-schemas solves yadage deps.
+    "checksumdir>=1.1.4,<1.2",
 ]
 
 packages = find_packages()
