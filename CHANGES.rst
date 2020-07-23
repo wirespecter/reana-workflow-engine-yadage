@@ -4,6 +4,7 @@ Changes
 Version master (UNRELEASED)
 ---------------------------
 
+- Uses python3.8
 - Pins all Python dependencies allowing to easily rebuild component images at later times.
 - Upgrades to Yadage 0.20.1.
 - Creates workflow visualisation graph by default.

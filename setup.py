@@ -42,9 +42,8 @@ setup_requires = [
 install_requires = [
     "adage==0.10.1",  # FIXME remove once yadage-schemas solves yadage deps.
     "click>=7",
-    "enum34>=1.1.6",
     "graphviz>=0.12",  # FIXME needed only if yadage visuale=True.
-    "jq==0.1.6",
+    "jq>=0.1.7",
     "networkx==1.11",
     "packtivity==0.14.21",
     "pydot2>=1.0.33",  # FIXME needed only if yadage visuale=True.
@@ -98,10 +97,8 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
