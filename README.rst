@@ -1,6 +1,6 @@
-==============================
- REANA-Workflow-Engine-Yadage
-==============================
+############################
+REANA-Workflow-Engine-Yadage
+############################
 
 .. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-yadage.svg
       :target: https://travis-ci.org/reanahub/reana-workflow-engine-yadage
@@ -21,7 +21,7 @@
     :target: https://github.com/psf/black
 
 About
------
+=====
 
 REANA-Workflow-Engine-Yadage is a component of the `REANA
 <http://www.reana.io/>`_ reusable and reproducible research data analysis
@@ -29,19 +29,26 @@ platform. It takes care of instantiating, executing and managing `Yadage
 <https://github.com/diana-hep/yadage>`_ based computational workflows.
 
 Features
---------
+========
 
 - start Yadage workflows
 - control workflow steps
 
+Usage
+=====
+
+The detailed information on how to install and use REANA can be found in
+`docs.reana.io <https://docs.reana.io>`_.
+
 Useful links
-------------
+============
 
-- `documentation <https://reana-workflow-engine-yadage.readthedocs.io/>`_
-- `releases <https://github.com/reanahub/reana-workflow-engine-yadage/releases>`_
-- `known issues <https://github.com/reanahub/reana-workflow-engine-yadage/issues>`_
-- `source code <https://github.com/reanahub/reana-workflow-engine-yadage>`_
+- `REANA project home page <http://www.reana.io/>`_
+- `REANA user documentation <https://docs.reana.io>`_
+- `REANA user support forum <https://forum.reana.io>`_
 
-For more information about the REANA reusable analysis platform, please see the
-`REANA project <http://www.reana.io>`_ home page and the general `REANA
-documentation <http://reana.readthedocs.io/>`_ pages.
+- `REANA-Workflow-Engine-Yadage releases <https://reana-workflow-engine-yadage.readthedocs.io/en/latest#changes>`_
+- `REANA-Workflow-Engine-Yadage docker images <https://hub.docker.com/r/reanahub/reana-workflow-engine-yadage>`_
+- `REANA-Workflow-Engine-Yadage developer documentation <https://reana-workflow-engine-yadage.readthedocs.io/>`_
+- `REANA-Workflow-Engine-Yadage known issues <https://github.com/reanahub/reana-workflow-engine-yadage/issues>`_
+- `REANA-Workflow-Engine-Yadage source code <https://github.com/reanahub/reana-workflow-engine-yadage>`_
