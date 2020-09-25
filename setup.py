@@ -50,7 +50,7 @@ install_requires = [
     "pydotplus>=2.0.2",  # FIXME needed only if yadage visuale=True.
     "pygraphviz>=1.5",  # FIXME needed only if yadage visuale=True.
     "pyOpenSSL==19.0.0",  # FIXME remove once yadage-schemas solves deps.
-    "reana-commons>=0.7.0a4,<0.8.0",
+    "reana-commons>=0.8.0a1,<0.9.0",
     "requests==2.22.0",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
     "strict-rfc3339==0.7",  # FIXME remove once yadage-schemas solves deps.
