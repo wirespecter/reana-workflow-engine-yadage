@@ -146,6 +146,7 @@ def run_yadage_workflow(
             updateinterval=5,
             loginterval=5,
             backend=cap_backend,
+            accept_metadir="accept_metadir" in operational_options,
             **workflow_kwargs,
         ) as ys:
 

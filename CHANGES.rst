@@ -4,6 +4,7 @@ Changes
 Version 0.7.0 (2020-10-20)
 --------------------------
 
+- Allows restarting of yadage workflows.
 - Adds creation of workflow visualisation graph by default when a workflow runs.
 - Adds option to specify unpacked Docker images as workflow step requirement.
 - Adds handling of workflow specification load logic that was done before in ``reana-client``.
