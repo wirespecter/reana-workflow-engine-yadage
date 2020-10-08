@@ -1,10 +1,15 @@
 Changes
 =======
 
-Version 0.7.0 (2020-10-20)
+Version 0.7.1 (UNRELEASED)
 --------------------------
 
 - Allows restarting of yadage workflows.
+- Allows `htcondor_max_runtime` and `htcondor_accounting_group` to be specified for HTC jobs.
+
+Version 0.7.0 (2020-10-20)
+--------------------------
+
 - Adds creation of workflow visualisation graph by default when a workflow runs.
 - Adds option to specify unpacked Docker images as workflow step requirement.
 - Adds handling of workflow specification load logic that was done before in ``reana-client``.
