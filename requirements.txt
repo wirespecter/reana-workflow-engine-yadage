@@ -19,7 +19,7 @@ decorator==4.4.2          # via jsonpath-rw, networkx
 glob2==0.7                # via packtivity, yadage
 graphviz==0.14.1          # via reana-workflow-engine-yadage (setup.py)
 idna==2.8                 # via jsonschema, requests
-jq==0.1.7                 # via packtivity, reana-workflow-engine-yadage (setup.py), yadage
+jq==0.1.7                 # via packtivity, -r requirements.in, yadage
 jsonpath-rw==1.4.0        # via packtivity, yadage
 jsonpointer==2.0          # via jsonschema, packtivity, yadage
 jsonref==0.2              # via bravado-core, packtivity, yadage, yadage-schemas

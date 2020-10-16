@@ -48,6 +48,9 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 
+# Autodoc mocking to fix ReadTheDocs builds missing system dependencies
+autodoc_mock_imports = ["jq"]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

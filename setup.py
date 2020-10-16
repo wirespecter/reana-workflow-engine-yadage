@@ -26,6 +26,7 @@ extras_require = {
     "debug": ["wdb", "ipdb", "Flask-DebugToolbar",],
     "docs": ["Sphinx>=1.5.1", "sphinx-rtd-theme>=0.1.9",],
     "tests": tests_require,
+    "jq": ["jq==0.1.7",],
 }
 
 extras_require["all"] = []
@@ -43,7 +44,6 @@ install_requires = [
     "adage==0.10.1",  # FIXME remove once yadage-schemas solves yadage deps.
     "click>=7",
     "graphviz>=0.12",  # FIXME needed only if yadage visuale=True.
-    "jq==0.1.7",
     "networkx==1.11",
     "packtivity==0.14.21",
     "pydot2>=1.0.33",  # FIXME needed only if yadage visuale=True.
