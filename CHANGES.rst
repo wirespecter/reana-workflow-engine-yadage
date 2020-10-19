@@ -1,18 +1,19 @@
 Changes
 =======
 
-Version master (UNRELEASED)
----------------------------
+Version 0.7.0 (2020-10-20)
+--------------------------
 
-- Uses python3.8
-- Pins all Python dependencies allowing to easily rebuild component images at later times.
-- Upgrades to Yadage 0.20.1.
-- Creates workflow visualisation graph by default.
-- Allows specifying unpacked Docker images as workflow step requirement.
-- Performs workflow specification load logic. Before in ``reana-client``.
-- Adds VOMS proxy support as a new authentication method.
-- Add Black formatter support.
-- Adds initfiles as an operational option for Yadage.
+- Adds creation of workflow visualisation graph by default when a workflow runs.
+- Adds option to specify unpacked Docker images as workflow step requirement.
+- Adds handling of workflow specification load logic that was done before in ``reana-client``.
+- Adds support for VOMS proxy as a new authentication method.
+- Adds support for ``initfiles`` operational option.
+- Adds pinning of all Python dependencies allowing to easily rebuild component images at later times.
+- Changes Yadage workflow engine to version 0.20.1.
+- Changes base image to use Python 3.8.
+- Changes code formatting to respect ``black`` coding style.
+- Changes documentation to single-page layout.
 
 Version 0.6.1 (2020-05-25)
 --------------------------
