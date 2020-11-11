@@ -6,6 +6,7 @@
 #
 adage==0.10.1             # via reana-workflow-engine-yadage (setup.py), yadage
 amqp==2.6.1               # via kombu
+appdirs==1.4.4            # via fs
 attrs==20.2.0             # via jsonschema
 bravado-core==5.17.0      # via bravado
 bravado==10.3.2           # via reana-commons
@@ -16,6 +17,7 @@ checksumdir==1.1.9        # via packtivity, reana-commons, reana-workflow-engine
 click==7.1.2              # via packtivity, reana-commons, reana-workflow-engine-yadage (setup.py), yadage, yadage-schemas
 cryptography==3.1.1       # via pyopenssl, requests
 decorator==4.4.2          # via jsonpath-rw, networkx
+fs==2.4.11                # via reana-commons
 glob2==0.7                # via packtivity, yadage
 graphviz==0.14.2          # via reana-workflow-engine-yadage (setup.py)
 idna==2.8                 # via jsonschema, requests
@@ -41,13 +43,13 @@ pyopenssl==19.0.0         # via reana-workflow-engine-yadage (setup.py), request
 pyparsing==2.4.7          # via pydot2, pydotplus
 pyrsistent==0.17.3        # via jsonschema
 python-dateutil==2.8.1    # via bravado, bravado-core
-pytz==2020.1              # via bravado-core
+pytz==2020.1              # via bravado-core, fs
 pyyaml==5.3.1             # via bravado, bravado-core, packtivity, reana-commons, yadage, yadage-schemas
-reana-commons==0.8.0a1	# via reana-workflow-engine-yadage (setup.py)
+reana-commons==0.8.0a8    # via reana-workflow-engine-yadage (setup.py)
 requests[security]==2.22.0  # via bravado, packtivity, reana-workflow-engine-yadage (setup.py), yadage, yadage-schemas
 rfc3987==1.3.8            # via jsonschema, reana-workflow-engine-yadage (setup.py)
 simplejson==3.17.2        # via bravado, bravado-core
-six==1.15.0               # via bravado, bravado-core, cryptography, jsonpath-rw, jsonschema, mock, pyopenssl, python-dateutil, sqlalchemy-utils, webcolors
+six==1.15.0               # via bravado, bravado-core, cryptography, fs, jsonpath-rw, jsonschema, mock, pyopenssl, python-dateutil, sqlalchemy-utils, webcolors
 sqlalchemy-utils==0.36.8  # via reana-workflow-engine-yadage (setup.py)
 sqlalchemy==1.3.20        # via reana-workflow-engine-yadage (setup.py), sqlalchemy-utils
 strict-rfc3339==0.7       # via jsonschema, reana-workflow-engine-yadage (setup.py)

@@ -84,6 +84,8 @@ class ExternalBackend(object):
         kubernetes_uid = None
         unpacked_img = None
         voms_proxy = None
+        htcondor_max_runtime = None
+        htcondor_accounting_group = None
         resources = spec["environment"].get("resources", None)
         if resources:
             for item in resources:
@@ -97,6 +99,10 @@ class ExternalBackend(object):
                     unpacked_img = item["unpacked_img"]
                 if "voms_proxy" in item.keys():
                     voms_proxy = item["voms_proxy"]
+                if "htcondor_max_runtime" in item.keys():
+                    htcondor_max_runtime = item["htcondor_max_runtime"]
+                if "htcondor_accounting_group" in item.keys():
+                    htcondor_accounting_group = item["htcondor_accounting_group"]
 
         log.info("state context is {0}".format(state))
         log.info("would run job {0}".format(job))
@@ -126,6 +132,10 @@ class ExternalBackend(object):
             job_request_body["unpacked_img"] = unpacked_img
         if voms_proxy:
             job_request_body["voms_proxy"] = voms_proxy
+        if htcondor_max_runtime:
+            job_request_body["htcondor_max_runtime"] = htcondor_max_runtime
+        if htcondor_accounting_group:
+            job_request_body["htcondor_accounting_group"] = htcondor_accounting_group
 
         job_id = self.rjc_api_client.submit(**job_request_body)
 
