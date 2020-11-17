@@ -62,7 +62,7 @@ class ExternalBackend(object):
 
         self._fail_info = None
 
-    def submit(self, spec, parameters, state, metadata):
+    def submit(self, spec, parameters, state, metadata):  # noqa: C901
         """Submit a yadage packtivity to RJC."""
         parameters, state = finalize_inputs(parameters, state)
         job = build_job(spec["process"], parameters, state, self.config)
