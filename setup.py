@@ -60,6 +60,7 @@ install_requires = [
     "yadage-schemas==0.10.6",
     "webcolors==1.9.1",  # FIXME remove once yadage-schemas solves yadage deps.
     "checksumdir>=1.1.4,<1.2",
+    "mock>=3.0,<4",
 ]
 
 packages = find_packages()
@@ -67,7 +68,7 @@ packages = find_packages()
 
 # Get the version string. Cannot be done with import!
 with open(os.path.join("reana_workflow_engine_yadage", "version.py"), "rt") as f:
-    version = re.search('__version__\s*=\s*"(?P<version>.*)"\n', f.read()).group(
+    version = re.search(r'__version__\s*=\s*"(?P<version>.*)"\n', f.read()).group(
         "version"
     )
 

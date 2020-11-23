@@ -26,9 +26,7 @@ log = logging.getLogger(LOGGING_MODULE)
 
 def analyze_progress(adageobj):
     """Analyze the workflow progress."""
-    dag, rules, applied = adageobj.dag, adageobj.rules, adageobj.applied_rules
-    successful, failed, running, unsubmittable = 0, 0, 0, 0
-
+    dag = adageobj.dag
     nodestates = []
     for node in nx.topological_sort(dag):
         nodeobj = dag.getNode(node)

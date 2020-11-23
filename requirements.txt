@@ -27,7 +27,7 @@ jsonpointer==2.0          # via jsonschema, packtivity, yadage
 jsonref==0.2              # via bravado-core, packtivity, yadage, yadage-schemas
 jsonschema[format]==3.2.0  # via bravado-core, packtivity, reana-commons, yadage, yadage-schemas
 kombu==4.6.11             # via reana-commons
-mock==3.0.5               # via packtivity, reana-commons
+mock==3.0.5               # via packtivity, reana-commons, reana-workflow-engine-yadage (setup.py)
 monotonic==1.5            # via bravado
 msgpack-python==0.5.6     # via bravado
 msgpack==1.0.0            # via bravado-core
