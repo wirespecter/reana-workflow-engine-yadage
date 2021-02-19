@@ -41,7 +41,7 @@ def analyze_progress(adageobj):
             )
         elif dagstate.node_status(nodeobj):
             nodestates.append(
-                {"state": "succeeded", "job_id": nodeobj.resultproxy.jobproxy["job_id"]}
+                {"state": "finished", "job_id": nodeobj.resultproxy.jobproxy["job_id"]}
             )
         elif dagstate.node_ran_and_failed(nodeobj):
             nodestates.append(
@@ -94,7 +94,7 @@ class REANATracker(object):
         for node in analyze_progress(adageobj):
             key = {
                 "running": "running",
-                "succeeded": "finished",
+                "finished": "finished",
                 "failed": "failed",
                 "unsubmittable": "planned",
                 "scheduled": "total",

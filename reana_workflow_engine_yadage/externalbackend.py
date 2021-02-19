@@ -185,7 +185,7 @@ class ExternalBackend(object):
 
     def successful(self, resultproxy):
         """Check if the packtivity was successful."""
-        return self._get_state(resultproxy) == "succeeded"
+        return self._get_state(resultproxy) == "finished"
 
     def fail_info(self, resultproxy):
         """Retrieve the fail info."""
