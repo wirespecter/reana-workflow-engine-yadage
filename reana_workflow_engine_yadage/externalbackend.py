@@ -10,7 +10,7 @@
 import base64
 import logging
 import os
-import pipes
+import shlex
 
 from packtivity.asyncbackends import ExternalAsyncProxy
 from packtivity.syncbackends import build_job, finalize_inputs, packconfig, publish
@@ -22,20 +22,12 @@ from .utils import REANAWorkflowStatusPublisher
 log = logging.getLogger(LOGGING_MODULE)
 
 
-def make_oneliner(job):
-    """Convert a command into oneliner."""
-    wrapped_cmd = "sh -c {}  ".format(pipes.quote(job["command"]))
-    return wrapped_cmd
-
-
 def make_script(job):
     """Encode script type commands in base64."""
     encoded_script = base64.b64encode(job["script"].encode("utf-8")).decode("utf-8")
-    cmd = "echo {encoded}|base64 -d|{interpreter}".format(
+    return "echo {encoded}|base64 -d|{interpreter}".format(
         encoded=encoded_script, interpreter=job["interpreter"]
     )
-    wrapped_cmd = "sh -c {}  ".format(pipes.quote(cmd))
-    return wrapped_cmd
 
 
 class ReanaExternalProxy(ExternalAsyncProxy):
@@ -68,8 +60,7 @@ class ExternalBackend(object):
         job = build_job(spec["process"], parameters, state, self.config)
 
         if "command" in job:
-            prettified_cmd = job["command"]
-            wrapped_cmd = make_oneliner(job)
+            prettified_cmd = wrapped_cmd = job["command"]
         elif "script" in job:
             prettified_cmd = job["script"]
             wrapped_cmd = make_script(job)
