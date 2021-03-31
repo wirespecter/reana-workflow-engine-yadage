@@ -2,7 +2,7 @@
 REANA-Workflow-Engine-Yadage
 ############################
 
-. image:: https://github.com/reanahub/reana-workflow-engine-yadage/workflows/CI/badge.svg
+.. image:: https://github.com/reanahub/reana-workflow-engine-yadage/workflows/CI/badge.svg
       :target: https://github.com/reanahub/reana-workflow-engine-yadage/actions
 
 .. image:: https://readthedocs.org/projects/reana-workflow-engine-yadage/badge/?version=latest
