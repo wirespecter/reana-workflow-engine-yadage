@@ -73,6 +73,7 @@ class ExternalBackend(object):
         kerberos = None
         compute_backend = None
         kubernetes_uid = None
+        kubernetes_memory_limit = None
         unpacked_img = None
         voms_proxy = None
         htcondor_max_runtime = None
@@ -86,6 +87,8 @@ class ExternalBackend(object):
                     compute_backend = item["compute_backend"]
                 if "kubernetes_uid" in item.keys():
                     kubernetes_uid = item["kubernetes_uid"]
+                if "kubernetes_memory_limit" in item.keys():
+                    kubernetes_memory_limit = item["kubernetes_memory_limit"]
                 if "unpacked_img" in item.keys():
                     unpacked_img = item["unpacked_img"]
                 if "voms_proxy" in item.keys():
@@ -119,6 +122,8 @@ class ExternalBackend(object):
             job_request_body["kerberos"] = kerberos
         if kubernetes_uid:
             job_request_body["kubernetes_uid"] = kubernetes_uid
+        if kubernetes_memory_limit:
+            job_request_body["kubernetes_memory_limit"] = kubernetes_memory_limit
         if unpacked_img:
             job_request_body["unpacked_img"] = unpacked_img
         if voms_proxy:
