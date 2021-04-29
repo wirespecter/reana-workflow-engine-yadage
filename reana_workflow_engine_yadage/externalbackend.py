@@ -15,6 +15,7 @@ import pipes
 from packtivity.asyncbackends import ExternalAsyncProxy
 from packtivity.syncbackends import build_job, finalize_inputs, packconfig, publish
 from reana_commons.api_client import JobControllerAPIClient as RJC_API_Client
+from reana_commons.utils import build_progress_message
 
 from .config import LOGGING_MODULE, MOUNT_CVMFS
 from .utils import REANAWorkflowStatusPublisher
@@ -140,7 +141,11 @@ class ExternalBackend(object):
         job_id = self.rjc_api_client.submit(**job_request_body)
 
         log.info("submitted job:{0}".format(job_id))
-        message = {"job_id": str(job_id)}
+        message = {
+            "progress": build_progress_message(
+                running={"total": 1, "job_ids": [job_id.get("job_id")]}
+            )
+        }
         workflow_uuid = os.getenv("workflow_uuid", "default")
         status_running = 1
         try:
