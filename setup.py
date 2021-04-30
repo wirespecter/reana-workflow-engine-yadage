@@ -54,8 +54,6 @@ install_requires = [
     "requests==2.22.0",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
     "strict-rfc3339==0.7",  # FIXME remove once yadage-schemas solves deps.
-    "SQLAlchemy-Utils>=0.32.18",
-    "SQLAlchemy>=1.1.14",
     "yadage==0.20.1",
     "yadage-schemas==0.10.6",
     "webcolors==1.9.1",  # FIXME remove once yadage-schemas solves yadage deps.

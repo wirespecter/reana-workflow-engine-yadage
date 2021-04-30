@@ -15,8 +15,10 @@ class REANAWorkflowStatusPublisher(object):
 
     __instance = None
 
-    def __new__(cls):
+    def __new__(cls, instance=None):
         """REANA workflow status publisher object creation."""
-        if REANAWorkflowStatusPublisher.__instance is None:
+        if instance:
+            REANAWorkflowStatusPublisher.__instance = instance
+        elif REANAWorkflowStatusPublisher.__instance is None:
             REANAWorkflowStatusPublisher.__instance = WorkflowStatusPublisher()
         return REANAWorkflowStatusPublisher.__instance
