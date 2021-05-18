@@ -42,7 +42,6 @@ setup_requires = [
 
 install_requires = [
     "adage==0.10.1",  # FIXME remove once yadage-schemas solves yadage deps.
-    "click>=7",
     "graphviz>=0.12",  # FIXME needed only if yadage visuale=True.
     "networkx==1.11",
     "packtivity==0.14.21",
