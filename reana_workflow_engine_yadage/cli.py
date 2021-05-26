@@ -13,7 +13,6 @@ import logging
 import os
 import yaml
 
-import yadageschemas
 from reana_commons.config import (
     REANA_LOG_FORMAT,
     REANA_LOG_LEVEL,
@@ -37,7 +36,7 @@ def run_yadage_workflow_engine_adapter(
     rjc_api_client,
     workflow_uuid=None,
     workflow_workspace=None,
-    workflow_file=None,
+    workflow_json=None,
     workflow_parameters=None,
     operational_options={},
     **kwargs,
@@ -51,29 +50,8 @@ def run_yadage_workflow_engine_adapter(
     os.umask(REANA_WORKFLOW_UMASK)
 
     cap_backend = setupbackend_fromstring("fromenv")
-    workflow_file_abs_path = os.path.join(workflow_workspace, workflow_file)
     publisher = REANAWorkflowStatusPublisher(instance=publisher)
-    if not os.path.exists(workflow_file_abs_path):
-        message = f"Workflow file {workflow_file} does not exist"
-        raise Exception(message)
-    else:
-        schema_name = "yadage/workflow-schema"
-        schemadir = None
-        specopts = {
-            "toplevel": operational_options["toplevel"],
-            "schema_name": schema_name,
-            "schemadir": schemadir,
-            "load_as_ref": False,
-        }
-
-        validopts = {
-            "schema_name": schema_name,
-            "schemadir": schemadir,
-        }
-        workflow_json = yadageschemas.load(
-            spec=workflow_file, specopts=specopts, validopts=validopts, validate=True,
-        )
-        workflow_kwargs = dict(workflow_json=workflow_json)
+    workflow_kwargs = dict(workflow_json=workflow_json)
     dataopts = {"initdir": operational_options["initdir"]}
 
     initdata = {}

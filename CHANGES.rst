@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.8.0 (UNRELEASED)
+---------------------------
+
+- Adds users quota accounting.
+- Changes workflow specification loading to be done in ``reana-commons``.
+
 Version 0.7.4 (2021-04-28)
 --------------------------
 - Adds support for specifying ``kubernetes_memory_limit`` for Kubernetes compute backend jobs.
