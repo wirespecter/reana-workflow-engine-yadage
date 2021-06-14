@@ -82,6 +82,13 @@ class ExternalBackend(object):
         resources = spec["environment"].get("resources", None)
         if resources:
             for item in resources:
+                if not isinstance(item, dict):
+                    log.info(
+                        'REANA only supports dictionary entries for resources. "{0}" value is not formatted in such a way and will be ignored.'.format(
+                            item
+                        )
+                    )
+                    continue
                 if "kerberos" in item.keys():
                     kerberos = item["kerberos"]
                 if "compute_backend" in item.keys():
