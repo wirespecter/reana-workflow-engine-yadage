@@ -41,7 +41,6 @@ setup_requires = [
 ]
 
 install_requires = [
-    "adage==0.10.1",  # FIXME remove once yadage-schemas solves yadage deps.
     "click>=7",
     "graphviz>=0.12",  # FIXME needed only if yadage visuale=True.
     "networkx==1.11",
@@ -49,14 +48,9 @@ install_requires = [
     "pydot2>=1.0.33",  # FIXME needed only if yadage visuale=True.
     "pydotplus>=2.0.2",  # FIXME needed only if yadage visuale=True.
     "pygraphviz>=1.5",  # FIXME needed only if yadage visuale=True.
-    "pyOpenSSL==19.0.0",  # FIXME remove once yadage-schemas solves deps.
-    "reana-commons>=0.8.0a15,<0.9.0",
+    "reana-commons[yadage]>=0.8.0a17,<0.9.0",
     "requests==2.22.0",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
-    "strict-rfc3339==0.7",  # FIXME remove once yadage-schemas solves deps.
-    "yadage==0.20.1",
-    "yadage-schemas==0.10.6",
-    "webcolors==1.9.1",  # FIXME remove once yadage-schemas solves yadage deps.
     "checksumdir>=1.1.4,<1.2",
     "mock>=3.0,<4",
 ]
