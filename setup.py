@@ -19,7 +19,7 @@ readme = open("README.rst").read()
 history = open("CHANGES.rst").read()
 
 tests_require = [
-    "pytest-reana>=0.8.0a4,<0.9.0",
+    "pytest-reana>=0.8.0a5,<0.9.0",
 ]
 
 extras_require = {
@@ -48,7 +48,7 @@ install_requires = [
     "pydotplus>=2.0.2",  # FIXME needed only if yadage visuale=True.
     "pygraphviz>=1.5",  # FIXME needed only if yadage visuale=True.
     "reana-commons[yadage]>=0.8.0a17,<0.9.0",
-    "requests==2.22.0",
+    "requests>=2.25.1",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
     "checksumdir>=1.1.4,<1.2",
     "mock>=3.0,<4",
