@@ -17,7 +17,6 @@ from reana_commons.config import (
     REANA_LOG_FORMAT,
     REANA_LOG_LEVEL,
     REANA_WORKFLOW_UMASK,
-    SHARED_VOLUME_PATH,
 )
 from reana_commons.workflow_engine import create_workflow_engine_command
 from yadage.steering_api import steering_ctx
@@ -43,7 +42,6 @@ def run_yadage_workflow_engine_adapter(
 ):
     """Run a ``yadage`` workflow."""
     log.info("getting socket..")
-    workflow_workspace = "{0}/{1}".format(SHARED_VOLUME_PATH, workflow_workspace)
     # use some shared object between tasks.
     os.environ["workflow_uuid"] = workflow_uuid
     os.environ["workflow_workspace"] = workflow_workspace
