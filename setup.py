@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017, 2018, 2019, 2020 CERN.
+# Copyright (C) 2017, 2018, 2019, 2020, 2021 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -41,7 +41,9 @@ setup_requires = [
 ]
 
 install_requires = [
+    "checksumdir>=1.1.4,<1.2",
     "graphviz>=0.12",  # FIXME needed only if yadage visuale=True.
+    "mock>=3.0,<4",
     "networkx==1.11",
     "packtivity==0.14.21",
     "pydot2>=1.0.33",  # FIXME needed only if yadage visuale=True.
@@ -50,8 +52,6 @@ install_requires = [
     "reana-commons[yadage]>=0.8.0a21,<0.9.0",
     "requests>=2.25.1",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
-    "checksumdir>=1.1.4,<1.2",
-    "mock>=3.0,<4",
 ]
 
 packages = find_packages()
