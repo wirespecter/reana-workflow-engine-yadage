@@ -15,7 +15,7 @@ from packtivity.asyncbackends import ExternalAsyncProxy
 from packtivity.syncbackends import build_job, finalize_inputs, packconfig, publish
 from reana_commons.api_client import JobControllerAPIClient as RJC_API_Client
 
-from .config import LOGGING_MODULE, MOUNT_CVMFS
+from .config import LOGGING_MODULE, MOUNT_CVMFS, JobStatus
 
 log = logging.getLogger(LOGGING_MODULE)
 
@@ -43,14 +43,18 @@ class ReanaExternalProxy(ExternalAsyncProxy):
 
 
 class ExternalBackend:
-    """REANA yadage external packtivity backend class."""
+    """REANA yadage external packtivity backend class.
+
+    Submits jobs and fetches their statuses from the JobController.
+    """
 
     def __init__(self):
         """Initialize the REANA packtivity backend."""
         self.config = packconfig()
         self.rjc_api_client = RJC_API_Client("reana-job-controller")
 
-        self._fail_info = None
+        self.jobs_statuses = {}
+        self._fail_info = ""
 
     def submit(  # noqa: C901
         self, spec, parameters, state, metadata  # noqa: C901
@@ -68,7 +72,7 @@ class ExternalBackend:
         image = spec["environment"]["image"]
         imagetag = spec["environment"].get("imagetag", "")
         if imagetag:
-            image = image + ":" + imagetag
+            image = f"{image}:{imagetag}"
 
         kerberos = None
         compute_backend = None
@@ -78,39 +82,39 @@ class ExternalBackend:
         voms_proxy = None
         htcondor_max_runtime = None
         htcondor_accounting_group = None
-        resources = spec["environment"].get("resources", None)
-        if resources:
-            for item in resources:
-                if not isinstance(item, dict):
-                    log.info(
-                        'REANA only supports dictionary entries for resources. "{0}" value is not formatted in such a way and will be ignored.'.format(
-                            item
-                        )
+
+        resources = spec["environment"].get("resources", [])
+        for item in resources:
+            if not isinstance(item, dict):
+                log.info(
+                    'REANA only supports dictionary entries for resources. "{0}" value is not formatted in such a way and will be ignored.'.format(
+                        item
                     )
-                    continue
-                if "kerberos" in item.keys():
-                    kerberos = item["kerberos"]
-                if "compute_backend" in item.keys():
-                    compute_backend = item["compute_backend"]
-                if "kubernetes_uid" in item.keys():
-                    kubernetes_uid = item["kubernetes_uid"]
-                if "kubernetes_memory_limit" in item.keys():
-                    kubernetes_memory_limit = item["kubernetes_memory_limit"]
-                if "unpacked_img" in item.keys():
-                    unpacked_img = item["unpacked_img"]
-                if "voms_proxy" in item.keys():
-                    voms_proxy = item["voms_proxy"]
-                if "htcondor_max_runtime" in item.keys():
-                    htcondor_max_runtime = item["htcondor_max_runtime"]
-                if "htcondor_accounting_group" in item.keys():
-                    htcondor_accounting_group = item["htcondor_accounting_group"]
+                )
+                continue
+            if "kerberos" in item.keys():
+                kerberos = item["kerberos"]
+            if "compute_backend" in item.keys():
+                compute_backend = item["compute_backend"]
+            if "kubernetes_uid" in item.keys():
+                kubernetes_uid = item["kubernetes_uid"]
+            if "kubernetes_memory_limit" in item.keys():
+                kubernetes_memory_limit = item["kubernetes_memory_limit"]
+            if "unpacked_img" in item.keys():
+                unpacked_img = item["unpacked_img"]
+            if "voms_proxy" in item.keys():
+                voms_proxy = item["voms_proxy"]
+            if "htcondor_max_runtime" in item.keys():
+                htcondor_max_runtime = item["htcondor_max_runtime"]
+            if "htcondor_accounting_group" in item.keys():
+                htcondor_accounting_group = item["htcondor_accounting_group"]
 
         log.info("state context is {0}".format(state))
         log.info("would run job {0}".format(job))
 
         state.ensure()
 
-        log.info("submitting!")
+        log.info("Submitting job")
 
         workflow_uuid = os.getenv("workflow_uuid", "default")
         job_request_body = {
@@ -149,7 +153,7 @@ class ExternalBackend:
             jobproxy=job_submit_response, spec=spec, pardata=parameters, statedata=state
         )
 
-    def result(self, resultproxy):
+    def result(self, resultproxy: ReanaExternalProxy):
         """Retrieve the result of a packtivity run by RJC."""
         resultproxy.pardata, resultproxy.statedata = finalize_inputs(
             resultproxy.pardata, resultproxy.statedata
@@ -162,20 +166,36 @@ class ExternalBackend:
             self.config,
         )
 
-    def _get_state(self, resultproxy):
+    def _get_job_status_from_controller(self, job_id: str) -> str:
+        response = self.rjc_api_client.check_status(job_id)
+        return response["status"]
+
+    def _refresh_job_status(self, job_id: str) -> None:
+        self.jobs_statuses[job_id] = self._get_job_status_from_controller(job_id)
+
+    def _should_refresh_job_status(self, job_id: str) -> bool:
+        if job_id in self.jobs_statuses:
+            status = self.jobs_statuses[job_id]
+            return status == JobStatus.started
+        else:
+            return True
+
+    def _get_state(self, resultproxy: ReanaExternalProxy) -> str:
         """Get the packtivity state."""
-        status_res = self.rjc_api_client.check_status(resultproxy.jobproxy["job_id"])
-        return status_res["status"]
+        job_id = resultproxy.jobproxy["job_id"]
+        if self._should_refresh_job_status(job_id):
+            self._refresh_job_status(job_id)
+        return self.jobs_statuses[job_id]
 
-    def ready(self, resultproxy):
+    def ready(self, resultproxy: ReanaExternalProxy) -> bool:
         """Check if a packtivity is finished."""
-        return self._get_state(resultproxy) != "started"
+        return self._get_state(resultproxy) != JobStatus.started
 
-    def successful(self, resultproxy):
+    def successful(self, resultproxy: ReanaExternalProxy) -> bool:
         """Check if the packtivity was successful."""
-        return self._get_state(resultproxy) == "finished"
+        return self._get_state(resultproxy) == JobStatus.finished
 
     def fail_info(self, resultproxy):
         """Retrieve the fail info."""
-        self._fail_info += "\nraw info: {}".format(resultproxy)
+        self._fail_info += f"\nraw info: {resultproxy}"
         return self._fail_info

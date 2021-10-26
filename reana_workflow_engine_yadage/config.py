@@ -9,7 +9,7 @@
 """REANA Workflow Engine Yadage config."""
 
 import os
-from enum import IntEnum
+from enum import IntEnum, Enum
 
 MOUNT_CVMFS = os.getenv("REANA_MOUNT_CVMFS", "false")
 
@@ -32,3 +32,22 @@ class RunStatus(IntEnum):
     stopped = 5
     queued = 6
     pending = 7
+
+
+# defined in reana-db component, in reana_db/models.py file as JobStatus
+class JobStatus(str, Enum):
+    """Enumeration of job statuses.
+
+    Example:
+        JobStatus.started == "started"  # True
+    """
+
+    # FIXME: this state is not defined in reana-db but returned by r-job-controller
+    started = "started"
+
+    created = "created"
+    running = "running"
+    finished = "finished"
+    failed = "failed"
+    stopped = "stopped"
+    queued = "queued"
