@@ -109,12 +109,10 @@ class ExternalBackend:
             if "htcondor_accounting_group" in item.keys():
                 htcondor_accounting_group = item["htcondor_accounting_group"]
 
-        log.info("state context is {0}".format(state))
-        log.info("would run job {0}".format(job))
+        log.debug(f"state context is {state}")
+        log.debug(f"would run job {job}")
 
         state.ensure()
-
-        log.info("Submitting job")
 
         workflow_uuid = os.getenv("workflow_uuid", "default")
         job_request_body = {
@@ -143,6 +141,8 @@ class ExternalBackend:
             job_request_body["htcondor_max_runtime"] = htcondor_max_runtime
         if htcondor_accounting_group:
             job_request_body["htcondor_accounting_group"] = htcondor_accounting_group
+
+        log.debug("Submitting job")
 
         job_submit_response = self.rjc_api_client.submit(**job_request_body)
         job_id = job_submit_response.get("job_id")
