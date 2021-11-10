@@ -6,6 +6,8 @@ Version 0.8.0 (UNRELEASED)
 
 - Adds users quota accounting.
 - Changes workflow specification loading to be done in ``reana-commons``.
+- Changes workflow engine to reduce the number of API calls to REANA-Job-Controller.
+- Changes workflow engine to remove duplicated messages to the job status message queue.
 
 Version 0.7.5 (2021-07-05)
 --------------------------
