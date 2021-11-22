@@ -1,7 +1,7 @@
 Changes
 =======
 
-Version 0.8.0 (UNRELEASED)
+Version 0.8.0 (2021-11-22)
 ---------------------------
 
 - Adds users quota accounting.
@@ -11,10 +11,12 @@ Version 0.8.0 (UNRELEASED)
 
 Version 0.7.5 (2021-07-05)
 --------------------------
+
 - Changes internal dependencies to remove click.
 
 Version 0.7.4 (2021-04-28)
 --------------------------
+
 - Adds support for specifying ``kubernetes_memory_limit`` for Kubernetes compute backend jobs.
 
 Version 0.7.3 (2021-03-17)
