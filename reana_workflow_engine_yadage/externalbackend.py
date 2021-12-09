@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This file is part of REANA.
 # Copyright (C) 2017-2021 CERN.
 #
@@ -10,6 +8,7 @@
 import base64
 import logging
 import os
+from typing import Any, Dict, List, Union
 
 from packtivity.asyncbackends import ExternalAsyncProxy
 from packtivity.syncbackends import build_job, finalize_inputs, packconfig, publish
@@ -56,12 +55,41 @@ class ExternalBackend:
         self.jobs_statuses = {}
         self._fail_info = ""
 
+    @staticmethod
+    def _get_resources(resources: List[Union[Dict, Any]]) -> Dict[str, Any]:
+        parameters = {}
+
+        def set_parameter(resource: Dict[str, Any], key: str) -> None:
+            if key in resource and resource[key] is not None:
+                parameters[key] = resource[key]
+
+        for item in resources:
+            if not isinstance(item, dict):
+                log.info(
+                    "REANA only supports dictionary entries for resources. "
+                    f'"{item}" value is not formatted in such a way and will be ignored.'
+                )
+                continue
+            set_parameter(item, "kerberos")
+            set_parameter(item, "compute_backend")
+            set_parameter(item, "kubernetes_uid")
+            set_parameter(item, "kubernetes_memory_limit")
+            set_parameter(item, "kubernetes_job_timeout")
+            set_parameter(item, "unpacked_img")
+            set_parameter(item, "voms_proxy")
+            set_parameter(item, "htcondor_max_runtime")
+            set_parameter(item, "htcondor_accounting_group")
+        return parameters
+
     def submit(  # noqa: C901
         self, spec, parameters, state, metadata  # noqa: C901
     ) -> ReanaExternalProxy:  # noqa: C901
         """Submit a yadage packtivity to RJC."""
         parameters, state = finalize_inputs(parameters, state)
         job = build_job(spec["process"], parameters, state, self.config)
+
+        log.debug(f"state context is {state}")
+        state.ensure()
 
         if "command" in job:
             prettified_cmd = wrapped_cmd = job["command"]
@@ -74,45 +102,10 @@ class ExternalBackend:
         if imagetag:
             image = f"{image}:{imagetag}"
 
-        kerberos = None
-        compute_backend = None
-        kubernetes_uid = None
-        kubernetes_memory_limit = None
-        unpacked_img = None
-        voms_proxy = None
-        htcondor_max_runtime = None
-        htcondor_accounting_group = None
-
         resources = spec["environment"].get("resources", [])
-        for item in resources:
-            if not isinstance(item, dict):
-                log.info(
-                    'REANA only supports dictionary entries for resources. "{0}" value is not formatted in such a way and will be ignored.'.format(
-                        item
-                    )
-                )
-                continue
-            if "kerberos" in item.keys():
-                kerberos = item["kerberos"]
-            if "compute_backend" in item.keys():
-                compute_backend = item["compute_backend"]
-            if "kubernetes_uid" in item.keys():
-                kubernetes_uid = item["kubernetes_uid"]
-            if "kubernetes_memory_limit" in item.keys():
-                kubernetes_memory_limit = item["kubernetes_memory_limit"]
-            if "unpacked_img" in item.keys():
-                unpacked_img = item["unpacked_img"]
-            if "voms_proxy" in item.keys():
-                voms_proxy = item["voms_proxy"]
-            if "htcondor_max_runtime" in item.keys():
-                htcondor_max_runtime = item["htcondor_max_runtime"]
-            if "htcondor_accounting_group" in item.keys():
-                htcondor_accounting_group = item["htcondor_accounting_group"]
+        resources_parameters = self._get_resources(resources)
 
-        log.debug(f"state context is {state}")
         log.debug(f"would run job {job}")
-
-        state.ensure()
 
         workflow_uuid = os.getenv("workflow_uuid", "default")
         job_request_body = {
@@ -123,26 +116,8 @@ class ExternalBackend:
             "workflow_workspace": os.getenv("workflow_workspace", "default"),
             "job_name": metadata["name"],
             "cvmfs_mounts": MOUNT_CVMFS,
+            **resources_parameters,
         }
-
-        if compute_backend:
-            job_request_body["compute_backend"] = compute_backend
-        if kerberos:
-            job_request_body["kerberos"] = kerberos
-        if kubernetes_uid:
-            job_request_body["kubernetes_uid"] = kubernetes_uid
-        if kubernetes_memory_limit:
-            job_request_body["kubernetes_memory_limit"] = kubernetes_memory_limit
-        if unpacked_img:
-            job_request_body["unpacked_img"] = unpacked_img
-        if voms_proxy:
-            job_request_body["voms_proxy"] = voms_proxy
-        if htcondor_max_runtime:
-            job_request_body["htcondor_max_runtime"] = htcondor_max_runtime
-        if htcondor_accounting_group:
-            job_request_body["htcondor_accounting_group"] = htcondor_accounting_group
-
-        log.debug("Submitting job")
 
         job_submit_response = self.rjc_api_client.submit(**job_request_body)
         job_id = job_submit_response.get("job_id")
