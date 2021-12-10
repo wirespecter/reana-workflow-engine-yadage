@@ -9,7 +9,7 @@
 
 import json
 import logging
-from typing import NoReturn, Dict, Generator
+from typing import Dict, Generator
 
 import adage.dagstate as dagstate
 import adage.nodestate as nodestate
@@ -33,14 +33,14 @@ class REANATracker:
         self.publisher = publisher
         self.progress_state = self._build_init_progress_state()
 
-    def initialize(self, adageobj) -> NoReturn:
+    def initialize(self, adageobj) -> None:
         """Get the progress state when workflow starts.
 
         Method is called by Yadage package in the beginning of the workflow execution.
         """
         self.track(adageobj)
 
-    def track(self, adageobj) -> NoReturn:
+    def track(self, adageobj) -> None:
         """Get the progress state of the workflow and publish it if changed.
 
         Method is periodically called by Yadage package during the workflow execution,
@@ -53,7 +53,7 @@ class REANATracker:
             log.debug("track, workflow's progress state changed. Updating...")
             self._update_progress_state(current_progress_state)
 
-    def finalize(self, adageobj) -> NoReturn:
+    def finalize(self, adageobj) -> None:
         """Update the progress state at the end of the execution.
 
         Method is called at the end of Yadage workflow execution.
@@ -110,7 +110,7 @@ class REANATracker:
     def _workflow_failed(self) -> bool:
         return self.progress_state.get("failed", {}).get("total", -1) != 0
 
-    def _publish_progress(self):
+    def _publish_progress(self) -> None:
         message = {"progress": self.progress_state}
         status_running = int(RunStatus.running)
         try:
@@ -149,7 +149,7 @@ class REANATracker:
         progress["engine_specific"] = self._dump_workflow_dag(adageobj)
         return progress
 
-    def _update_progress_state(self, progress: Dict) -> NoReturn:
+    def _update_progress_state(self, progress: Dict) -> None:
         self.progress_state = progress
         self._publish_progress()
 
