@@ -48,6 +48,9 @@ def run_yadage_workflow_engine_adapter(
     os.environ["workflow_workspace"] = workflow_workspace
     os.umask(REANA_WORKFLOW_UMASK)
 
+    tracker = REANATracker(identifier=workflow_uuid, publisher=publisher)
+    tracker.publish_workflow_running_status()
+
     cap_backend = setupbackend_fromstring("fromenv")
     workflow_kwargs = dict(workflow_json=workflow_json)
     dataopts = {"initdir": operational_options["initdir"]}
@@ -58,7 +61,6 @@ def run_yadage_workflow_engine_adapter(
             initdata.update(**yaml.safe_load(stream))
     initdata.update(workflow_parameters)
 
-    tracker = REANATracker(identifier=workflow_uuid, publisher=publisher)
     with steering_ctx(
         dataarg=workflow_workspace,
         dataopts=dataopts,
@@ -74,8 +76,8 @@ def run_yadage_workflow_engine_adapter(
 
         ys.adage_argument(additional_trackers=[tracker])
 
-    # Hack to publish finished workflow status AFTER visualization is done.
-    tracker._publish_workflow_final_status()
+    # hack to publish finished workflow status AFTER Yadage visualization is done.
+    tracker.publish_workflow_final_status()
 
 
 run_yadage_workflow = create_workflow_engine_command(

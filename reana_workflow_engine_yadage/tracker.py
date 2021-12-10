@@ -65,14 +65,26 @@ class REANATracker:
         # needed to comment it here due to a hack in cli.py
         # self._publish_workflow_final_status()
 
-    def _publish_workflow_final_status(self):
+    def publish_workflow_running_status(self) -> None:
+        """Send MQ to indicate running status for tracked workflow."""
+        try:
+            log.debug("Publishing workflow running status...")
+            self.publisher.publish_workflow_status(
+                self.workflow_id, status=int(RunStatus.running)
+            )
+        except Exception as e:
+            log.error(f"Workflow running status publish failed: {e}")
+            raise e
+
+    def publish_workflow_final_status(self) -> None:
+        """Send MQ to indicate finished or failed status for the tracked workflow."""
         if self._workflow_failed():
-            log.info("Workflow failed. Publishing...")
+            log.info("Workflow failed. Publishing status...")
             self.publisher.publish_workflow_status(
                 self.workflow_id, int(RunStatus.failed)
             )
         else:
-            log.info("Workflow finished. Publishing...")
+            log.info("Workflow finished. Publishing status...")
             self.publisher.publish_workflow_status(
                 self.workflow_id, int(RunStatus.finished)
             )
