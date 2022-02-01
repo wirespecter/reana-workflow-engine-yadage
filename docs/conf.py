@@ -49,7 +49,7 @@ extensions = [
 ]
 
 # Autodoc mocking to fix ReadTheDocs builds missing system dependencies
-autodoc_mock_imports = ["jq"]
+autodoc_mock_imports = ["jq", "pygraphviz"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -65,7 +65,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "reana"
-copyright = "2017-2020, info@reana.io"
+copyright = "2017-2022, info@reana.io"
 author = "info@reana.io"
 
 # The version info for the project you're documenting, acts as replacement for

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017, 2018, 2019, 2020, 2021 CERN.
+# Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -27,6 +27,7 @@ extras_require = {
     "docs": ["Sphinx>=1.5.1", "sphinx-rtd-theme>=0.1.9",],
     "tests": tests_require,
     "jq": ["jq==0.1.7",],
+    "pygraphviz": ["pygraphviz>=1.5",],
 }
 
 extras_require["all"] = []
@@ -48,7 +49,6 @@ install_requires = [
     "packtivity==0.14.21",
     "pydot2>=1.0.33",  # FIXME needed only if yadage visuale=True.
     "pydotplus>=2.0.2",  # FIXME needed only if yadage visuale=True.
-    "pygraphviz>=1.5",  # FIXME needed only if yadage visuale=True.
     "reana-commons[yadage]>=0.8.0,<0.9.0",
     "requests>=2.25.1",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
