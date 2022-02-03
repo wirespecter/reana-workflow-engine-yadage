@@ -73,6 +73,7 @@ setup(
     url="https://github.com/reanahub/reana-workflow-engine-yadage",
     packages=["reana_workflow_engine_yadage",],
     zip_safe=False,
+    python_requires=">=3.8",
     install_requires=install_requires,
     entry_points={
         "console_scripts": [
