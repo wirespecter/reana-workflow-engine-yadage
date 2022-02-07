@@ -47,7 +47,7 @@ install_requires = [
     "mock>=3.0,<4",
     "pydot>=1.0.29",  # FIXME needed only if yadage visuale=True.
     "pydotplus>=2.0.2",  # FIXME needed only if yadage visuale=True.
-    "reana-commons[yadage]>=0.8.3,<0.9.0",
+    "reana-commons[yadage]==0.8.3a1",  # FIXME: Unpin when yadage>=0.20.2 is compatible
     "requests>=2.25.1",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
 ]
