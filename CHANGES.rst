@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.8.2 (2022-02-08)
+---------------------------
+
+- Changes dependencies to solve compatibility issues with ``Yadage 0.20.2`` version.
+
 Version 0.8.1 (2022-02-07)
 ---------------------------
 
