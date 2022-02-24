@@ -19,7 +19,7 @@ readme = open("README.rst").read()
 history = open("CHANGES.rst").read()
 
 tests_require = [
-    "pytest-reana>=0.8.1,<0.9.0",
+    "pytest-reana>=0.9.0a2,<0.10.0",
 ]
 
 extras_require = {
@@ -50,7 +50,7 @@ install_requires = [
     "adage==0.10.1",  # FIXME remove once yadage>=0.20.2 is compatible.
     "yadage==0.20.1",  # FIXME remove once yadage>=0.20.2 is compatible.
     "yadage-schemas==0.10.6",  # FIXME remove once yadage>=0.20.2 is compatible.
-    "reana-commons[yadage]>=0.8.4,<0.9.0",
+    "reana-commons[yadage]>=0.9.0a2,<0.10.0",
     "requests>=2.25.1",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
 ]
