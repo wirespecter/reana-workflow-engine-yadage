@@ -19,15 +19,26 @@ readme = open("README.rst").read()
 history = open("CHANGES.rst").read()
 
 tests_require = [
-    "pytest-reana>=0.9.0a2,<0.10.0",
+    "pytest-reana>=0.9.0a3,<0.10.0",
 ]
 
 extras_require = {
-    "debug": ["wdb", "ipdb", "Flask-DebugToolbar",],
-    "docs": ["Sphinx>=1.5.1", "sphinx-rtd-theme>=0.1.9",],
+    "debug": [
+        "wdb",
+        "ipdb",
+        "Flask-DebugToolbar",
+    ],
+    "docs": [
+        "Sphinx>=1.5.1",
+        "sphinx-rtd-theme>=0.1.9",
+    ],
     "tests": tests_require,
-    "jq": ["jq==0.1.7",],
-    "pygraphviz": ["pygraphviz>=1.5",],
+    "jq": [
+        "jq==0.1.7",
+    ],
+    "pygraphviz": [
+        "pygraphviz>=1.5",
+    ],
 }
 
 extras_require["all"] = []
@@ -50,7 +61,7 @@ install_requires = [
     "adage==0.10.1",  # FIXME remove once yadage>=0.20.2 is compatible.
     "yadage==0.20.1",  # FIXME remove once yadage>=0.20.2 is compatible.
     "yadage-schemas==0.10.6",  # FIXME remove once yadage>=0.20.2 is compatible.
-    "reana-commons[yadage]>=0.9.0a5,<0.10.0",
+    "reana-commons[yadage]>=0.9.0a6,<0.10.0",
     "requests>=2.25.1",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
 ]
@@ -72,7 +83,9 @@ setup(
     author="REANA",
     author_email="info@reana.io",
     url="https://github.com/reanahub/reana-workflow-engine-yadage",
-    packages=["reana_workflow_engine_yadage",],
+    packages=[
+        "reana_workflow_engine_yadage",
+    ],
     zip_safe=False,
     python_requires=">=3.8",
     install_requires=install_requires,

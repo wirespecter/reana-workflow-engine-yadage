@@ -116,7 +116,10 @@ class REANATracker:
         try:
             log.debug("Publishing workflow progress state to MQ...")
             self.publisher.publish_workflow_status(
-                self.workflow_id, status=status_running, logs=None, message=message,
+                self.workflow_id,
+                status=status_running,
+                logs=None,
+                message=message,
             )
         except Exception as e:
             log.error(f"Workflow status publish failed: {e}")

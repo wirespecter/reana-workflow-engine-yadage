@@ -61,8 +61,14 @@ class TestReanaTracker:
     @pytest.mark.parametrize(
         "progress,is_failed",
         [
-            (_build_progress_state(0, 2, 0, 0, 2), False,),
-            (_build_progress_state(0, 2, 1, 1, 0), True,),
+            (
+                _build_progress_state(0, 2, 0, 0, 2),
+                False,
+            ),
+            (
+                _build_progress_state(0, 2, 1, 1, 0),
+                True,
+            ),
             ({"failed": {"wrong_key": 0}}, True),
         ],
     )
