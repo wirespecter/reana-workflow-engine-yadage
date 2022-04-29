@@ -61,7 +61,7 @@ install_requires = [
     "adage==0.10.1",  # FIXME remove once yadage>=0.20.2 is compatible.
     "yadage==0.20.1",  # FIXME remove once yadage>=0.20.2 is compatible.
     "yadage-schemas==0.10.6",  # FIXME remove once yadage>=0.20.2 is compatible.
-    "reana-commons[yadage]>=0.9.0a6,<0.10.0",
+    "reana-commons[yadage]>=0.9.0a7,<0.10.0",
     "requests>=2.25.1",
     "rfc3987==1.3.8",  # FIXME remove once yadage-schemas solves yadage deps.
 ]
