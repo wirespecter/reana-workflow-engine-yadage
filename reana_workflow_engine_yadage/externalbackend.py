@@ -14,7 +14,7 @@ from packtivity.asyncbackends import ExternalAsyncProxy
 from packtivity.syncbackends import build_job, finalize_inputs, packconfig, publish
 from reana_commons.api_client import JobControllerAPIClient as RJC_API_Client
 
-from .config import LOGGING_MODULE, MOUNT_CVMFS, JobStatus
+from .config import LOGGING_MODULE, MOUNT_CVMFS, JobStatus, WORKFLOW_KERBEROS
 
 log = logging.getLogger(LOGGING_MODULE)
 
@@ -81,6 +81,10 @@ class ExternalBackend:
             set_parameter(item, "htcondor_accounting_group")
             set_parameter(item, "slurm_partition")
             set_parameter(item, "slurm_time")
+
+        if "kerberos" not in parameters:
+            parameters["kerberos"] = WORKFLOW_KERBEROS
+
         return parameters
 
     def submit(  # noqa: C901

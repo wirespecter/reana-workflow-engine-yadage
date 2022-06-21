@@ -22,11 +22,19 @@ class TestExternalBackend:
                     {"kubernetes_job_timeout": 20},
                     {"kubernetes_memory_limit": None},
                 ],
-                {"compute_backend": "kubernetes", "kubernetes_job_timeout": 20},
+                {
+                    "compute_backend": "kubernetes",
+                    "kubernetes_job_timeout": 20,
+                    "kerberos": False,
+                },
             ),
             (
                 [{"kubernetes_job_timeout": 10}, {"kubernetes_job_timeout": 30}],
-                {"kubernetes_job_timeout": 30},
+                {"kubernetes_job_timeout": 30, "kerberos": False},
+            ),
+            (
+                [{"kerberos": True}],
+                {"kerberos": True},
             ),
         ],
     )

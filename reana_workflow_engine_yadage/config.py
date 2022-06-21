@@ -8,6 +8,7 @@
 
 """REANA Workflow Engine Yadage config."""
 
+from distutils.util import strtobool
 import os
 from enum import IntEnum, Enum
 
@@ -18,6 +19,9 @@ LOGGING_MODULE = "reana-workflow-engine-yadage"
 WORKFLOW_TRACKING_UPDATE_INTERVAL_SECONDS = 15
 
 LOG_INTERVAL_SECONDS = 15
+
+WORKFLOW_KERBEROS = bool(strtobool(os.getenv("REANA_WORKFLOW_KERBEROS", "false")))
+"""Whether Kerberos is needed for the whole workflow."""
 
 
 # defined in reana-db component, in reana_db/models.py file as RunStatus
