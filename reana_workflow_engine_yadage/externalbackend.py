@@ -77,6 +77,7 @@ class ExternalBackend:
             set_parameter(item, "kubernetes_job_timeout")
             set_parameter(item, "unpacked_img")
             set_parameter(item, "voms_proxy")
+            set_parameter(item, "rucio")
             set_parameter(item, "htcondor_max_runtime")
             set_parameter(item, "htcondor_accounting_group")
             set_parameter(item, "slurm_partition")
