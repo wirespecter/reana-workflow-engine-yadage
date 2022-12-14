@@ -1,26 +1,27 @@
 Changes
 =======
 
-Version 0.9.0 (UNRELEASED)
----------------------------
+Version 0.9.0 (2023-01-19)
+--------------------------
 
-- Adds support for Rucio
-- Adds support for propagating global Kerberos flag from workflow specification to each job.
 - Adds support for specifying ``slurm_partition`` and ``slurm_time`` for Slurm compute backend jobs.
+- Adds support for Kerberos authentication for workflow orchestration.
+- Adds support for Rucio authentication for workflow jobs.
+- Changes the base image of the component to Ubuntu 20.04 LTS and reduces final Docker image size by removing build-time dependencies.
 
 Version 0.8.2 (2022-02-08)
----------------------------
+--------------------------
 
 - Changes dependencies to solve compatibility issues with ``Yadage 0.20.2`` version.
 
 Version 0.8.1 (2022-02-07)
----------------------------
+--------------------------
 
 - Adds support for specifying ``kubernetes_job_timeout`` for Kubernetes compute backend jobs.
 - Fixes workflow stuck in pending status due to early Yadage fail.
 
 Version 0.8.0 (2021-11-22)
----------------------------
+--------------------------
 
 - Adds users quota accounting.
 - Changes workflow specification loading to be done in ``reana-commons``.
