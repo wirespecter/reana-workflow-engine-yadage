@@ -5,10 +5,13 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 # Install base image and its dependencies
-FROM python:3.8-slim-buster
-# hadolint ignore=DL3008, DL3013, DL3015
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# hadolint ignore=DL3008, DL3013
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install --no-install-recommends -y \
       autoconf \
       automake \
       gcc \
@@ -17,13 +20,15 @@ RUN apt-get update && \
       imagemagick \
       libffi-dev \
       libtool \
+      make \
       openssl \
-      python3-dev \
+      python3.8 \
+      python3.8-dev \
       python3-pip \
       unzip \
       vim-tiny && \
-      apt-get clean && \
-      rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     pip install --upgrade pip
 
 # Install dependencies
