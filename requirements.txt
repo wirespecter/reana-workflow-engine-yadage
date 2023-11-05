@@ -21,7 +21,7 @@ fs==2.4.16                # via reana-commons
 glob2==0.7                # via packtivity, yadage
 graphviz==0.20.1          # via reana-workflow-engine-yadage (setup.py)
 idna==3.4                 # via jsonschema, requests
-jq==0.1.7                 # via -r requirements.in, packtivity, yadage
+jq==1.4.1                 # via -r requirements.in, packtivity, yadage
 jsonpath-rw==1.4.0        # via packtivity, yadage
 jsonpointer==2.4          # via jsonschema, packtivity, yadage
 jsonref==1.1.0            # via bravado-core, packtivity, yadage, yadage-schemas

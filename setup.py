@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 CERN.
+# Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022, 2023 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -34,7 +34,7 @@ extras_require = {
     ],
     "tests": tests_require,
     "jq": [
-        "jq==0.1.7",
+        "jq==1.4.1",
     ],
     "pygraphviz": [
         "pygraphviz>=1.5",
