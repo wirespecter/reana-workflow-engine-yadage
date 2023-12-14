@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.9.3 (UNRELEASED)
+--------------------------
+
+- Changes `jq` dependency version on amd64 architecture to older version, making certain Yadage workflows much faster.
+
 Version 0.9.2 (2023-12-12)
 --------------------------
 
