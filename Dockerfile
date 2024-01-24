@@ -64,9 +64,9 @@ RUN if [ "${DEBUG}" -gt 0 ]; then pip install --no-cache-dir -e ".[debug]"; else
 # hadolint ignore=DL3013
 RUN if test -e modules/reana-commons; then \
       if [ "${DEBUG}" -gt 0 ]; then \
-        pip install --no-cache-dir -e "modules/reana-commons[kubernetes]" --upgrade; \
+        pip install --no-cache-dir -e "modules/reana-commons[yadage]" --upgrade; \
       else \
-        pip install --no-cache-dir "modules/reana-commons[kubernetes]" --upgrade; \
+        pip install --no-cache-dir "modules/reana-commons[yadage]" --upgrade; \
       fi \
     fi
 
