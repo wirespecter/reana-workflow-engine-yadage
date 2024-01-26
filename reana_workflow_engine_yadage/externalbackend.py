@@ -14,7 +14,13 @@ from packtivity.asyncbackends import ExternalAsyncProxy
 from packtivity.syncbackends import build_job, finalize_inputs, packconfig, publish
 from reana_commons.api_client import JobControllerAPIClient as RJC_API_Client
 
-from .config import LOGGING_MODULE, MOUNT_CVMFS, JobStatus, WORKFLOW_KERBEROS
+from .config import (
+    JOB_TERMINAL_STATUSES,
+    LOGGING_MODULE,
+    MOUNT_CVMFS,
+    JobStatus,
+    WORKFLOW_KERBEROS,
+)
 
 log = logging.getLogger(LOGGING_MODULE)
 
@@ -156,11 +162,8 @@ class ExternalBackend:
         self.jobs_statuses[job_id] = self._get_job_status_from_controller(job_id)
 
     def _should_refresh_job_status(self, job_id: str) -> bool:
-        if job_id in self.jobs_statuses:
-            status = self.jobs_statuses[job_id]
-            return status == JobStatus.started
-        else:
-            return True
+        status = self.jobs_statuses.get(job_id)
+        return status not in JOB_TERMINAL_STATUSES
 
     def _get_state(self, resultproxy: ReanaExternalProxy) -> str:
         """Get the packtivity state."""
@@ -171,7 +174,7 @@ class ExternalBackend:
 
     def ready(self, resultproxy: ReanaExternalProxy) -> bool:
         """Check if a packtivity is finished."""
-        return self._get_state(resultproxy) != JobStatus.started
+        return self._get_state(resultproxy) in JOB_TERMINAL_STATUSES
 
     def successful(self, resultproxy: ReanaExternalProxy) -> bool:
         """Check if the packtivity was successful."""

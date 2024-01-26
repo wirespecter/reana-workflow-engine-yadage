@@ -55,3 +55,7 @@ class JobStatus(str, Enum):
     failed = "failed"
     stopped = "stopped"
     queued = "queued"
+
+
+JOB_TERMINAL_STATUSES = [JobStatus.finished, JobStatus.failed, JobStatus.stopped]
+"""Statuses that a job can be in at the end of its execution."""

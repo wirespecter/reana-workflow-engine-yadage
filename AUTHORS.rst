@@ -12,6 +12,7 @@ The list of contributors in alphabetical order:
 - `Dinos Kousidis <https://orcid.org/0000-0002-4914-4289>`_
 - `Jan Okraska <https://orcid.org/0000-0002-1416-3244>`_
 - `Lukas Heinrich <https://orcid.org/0000-0002-4048-7584>`_
+- `Marco Donadoni <https://orcid.org/0000-0003-2922-5505>`_
 - `Marco Vidal <https://orcid.org/0000-0002-9363-4971>`_
 - `Rokas Maciulaitis <https://orcid.org/0000-0003-1064-6967>`_
 - `Sinclert Pérez <https://www.linkedin.com/in/sinclert>`_
