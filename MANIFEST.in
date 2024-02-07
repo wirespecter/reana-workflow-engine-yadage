@@ -7,7 +7,6 @@
 include *.in
 include *.json
 include *.md
-include *.rst
 include *.sh
 include *.txt
 include *.yaml
@@ -19,7 +18,7 @@ include pytest.ini
 exclude .readthedocs.yaml
 recursive-include docs *.py
 recursive-include docs *.png
-recursive-include docs *.rst
+recursive-include docs *.md
 recursive-include docs *.txt
 recursive-include tests *.py
 recursive-include reana_workflow_engine_yadage *.json
