@@ -93,7 +93,6 @@ setup(
         "reana_workflow_engine_yadage",
     ],
     zip_safe=False,
-    python_requires=">=3.8",
     install_requires=install_requires,
     entry_points={
         "console_scripts": [
@@ -101,6 +100,7 @@ setup(
             "reana_workflow_engine_yadage.cli:run_yadage_workflow",
         ]
     },
+    python_requires=">=3.8",
     extras_require=extras_require,
     setup_requires=setup_requires,
     tests_require=tests_require,
