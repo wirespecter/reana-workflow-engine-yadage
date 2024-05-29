@@ -15,11 +15,8 @@ from unittest.mock import MagicMock
 import pytest
 
 
-def _build_progress_state(
-    planned: int, total: int, failed: int, running: int, finished: int
-):
+def _build_progress_state(total: int, failed: int, running: int, finished: int):
     return {
-        "planned": {"total": planned},
         "total": {"total": total},
         "failed": {"total": failed},
         "running": {"total": running},
@@ -32,18 +29,18 @@ class TestReanaTracker:
         "prev_progress,next_progress,is_progressed",
         [
             (
-                _build_progress_state(0, 0, 0, 0, 0),
-                _build_progress_state(0, 0, 0, 0, 0),
+                _build_progress_state(0, 0, 0, 0),
+                _build_progress_state(0, 0, 0, 0),
                 False,
             ),
             (
-                _build_progress_state(0, 0, 0, 0, 0),
-                _build_progress_state(0, 2, 0, 0, 0),
+                _build_progress_state(0, 0, 0, 0),
+                _build_progress_state(2, 0, 0, 0),
                 True,
             ),
             (
-                _build_progress_state(0, 0, 2, 0, 0),
-                _build_progress_state(0, 0, 2, 1, 0),
+                _build_progress_state(0, 2, 0, 0),
+                _build_progress_state(0, 2, 1, 0),
                 True,
             ),
         ],
@@ -62,11 +59,11 @@ class TestReanaTracker:
         "progress,is_failed",
         [
             (
-                _build_progress_state(0, 2, 0, 0, 2),
+                _build_progress_state(2, 0, 0, 2),
                 False,
             ),
             (
-                _build_progress_state(0, 2, 1, 1, 0),
+                _build_progress_state(2, 1, 1, 0),
                 True,
             ),
             ({"failed": {"wrong_key": 0}}, True),

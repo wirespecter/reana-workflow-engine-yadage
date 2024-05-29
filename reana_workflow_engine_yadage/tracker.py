@@ -92,7 +92,6 @@ class REANATracker:
     @staticmethod
     def _build_init_progress_state() -> Dict:
         return {
-            "planned": {"total": 0, "job_ids": []},
             "failed": {"total": 0, "job_ids": []},
             "total": {"total": 0, "job_ids": []},
             "running": {"total": 0, "job_ids": []},
@@ -176,9 +175,6 @@ class REANATracker:
             elif dagstate.node_ran_and_failed(nodeobj):
                 state = "failed"
                 job_id = nodeobj.resultproxy.jobproxy["job_id"]
-            elif dagstate.upstream_failure(dag, nodeobj):
-                state = "planned"
-                job_id = None
             else:
                 state = "total"
                 job_id = None
