@@ -1,22 +1,24 @@
 # This file is part of REANA.
-# Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022, 2023 CERN.
+# Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 # Use Ubuntu LTS base image
-FROM docker.io/library/ubuntu:20.04
+FROM docker.io/library/ubuntu:24.04
 
 # Use default answers in installation commands
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Use distutils provided by the standard Python library instead of the vendored one in
-# setuptools, so that editable installations are stored in the right directory.
-# See https://github.com/pypa/setuptools/issues/3301
-ENV SETUPTOOLS_USE_DISTUTILS=stdlib
+# Allow pip to install packages in the system site-packages dir
+ENV PIP_BREAK_SYSTEM_PACKAGES=true
 
 # Prepare list of Python dependencies
 COPY requirements.txt /code/
+
+# Copy cluster component source code
+WORKDIR /code
+COPY . /code
 
 # Install all system and Python dependencies in one go
 # hadolint ignore=DL3008,DL3013
@@ -32,12 +34,13 @@ RUN apt-get update -y && \
       libtool \
       make \
       openssl \
-      python3.8 \
-      python3.8-dev \
+      python3.12 \
+      python3.12-dev \
       python3-pip \
       unzip \
       vim-tiny && \
-    pip install --no-cache-dir --upgrade pip setuptools && \
+    pip install --no-cache-dir "modules/reana-commons[yadage]" --upgrade && \
+    pip install --no-cache-dir --upgrade setuptools && \
     pip install --no-cache-dir -r /code/requirements.txt && \
     apt-get remove -y \
       autoconf \
@@ -47,14 +50,10 @@ RUN apt-get update -y && \
       libffi-dev \
       libtool \
       make \
-      python3.8-dev && \
+      python3.12-dev && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Copy cluster component source code
-WORKDIR /code
-COPY . /code
 
 # Are we debugging?
 ARG DEBUG=0

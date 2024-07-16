@@ -4,7 +4,7 @@
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-jq==0.1.7; platform_machine == "x86_64"
+jq==1.7.0; platform_machine == "x86_64"
 jq==1.4.1; platform_machine == "aarch4"
-jq==1.4.1; platform_machine == "arm64"
+jq==1.7.0; platform_machine == "arm64"
 pygraphviz==1.8

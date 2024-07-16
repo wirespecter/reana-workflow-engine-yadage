@@ -36,9 +36,9 @@ extras_require = {
     "tests": tests_require,
     # Using older jq on amd64 due to https://github.com/reanahub/reana-demo-bsm-search/issues/21
     "jq": [
-        "jq==0.1.7; platform_machine == 'x86_64'",
+        "jq==1.7.0; platform_machine == 'x86_64'",
         "jq==1.4.1; platform_machine == 'aarch4'",
-        "jq==1.4.1; platform_machine == 'arm64'",
+        "jq==1.7.0; platform_machine == 'arm64'",
     ],
     "pygraphviz": [
         "pygraphviz>=1.5",
@@ -62,8 +62,8 @@ install_requires = [
     "pydotplus>=2.0.2",  # FIXME needed only if yadage visuale=True.
     # Pinning adage/packtivity/yadage/yadage-schemas to make sure we use compatible versions.
     # See https://github.com/reanahub/reana-workflow-engine-yadage/pull/236#discussion_r992475484
-    "adage==0.10.1",
-    "packtivity==0.14.24",
+    "adage==0.11.0",
+    "packtivity==0.16.2",
     "yadage==0.20.1",
     "yadage-schemas==0.10.6",
     "reana-commons[yadage]>=0.95.0a2,<0.96.0",
