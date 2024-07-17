@@ -16,10 +16,6 @@ ENV PIP_BREAK_SYSTEM_PACKAGES=true
 # Prepare list of Python dependencies
 COPY requirements.txt /code/
 
-# Copy cluster component source code
-WORKDIR /code
-COPY . /code
-
 # Install all system and Python dependencies in one go
 # hadolint ignore=DL3008,DL3013
 RUN apt-get update -y && \
@@ -39,7 +35,6 @@ RUN apt-get update -y && \
       python3-pip \
       unzip \
       vim-tiny && \
-    pip install --no-cache-dir "modules/reana-commons[yadage]" --upgrade && \
     pip install --no-cache-dir --upgrade setuptools && \
     pip install --no-cache-dir -r /code/requirements.txt && \
     apt-get remove -y \
@@ -54,6 +49,10 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Copy cluster component source code
+WORKDIR /code
+COPY . /code
 
 # Are we debugging?
 ARG DEBUG=0
