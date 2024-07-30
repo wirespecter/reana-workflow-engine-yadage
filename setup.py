@@ -18,10 +18,6 @@ from setuptools import find_packages, setup
 readme = open("README.md").read()
 history = open("CHANGELOG.md").read()
 
-tests_require = [
-    "pytest-reana>=0.95.0a2,<0.96.0",
-]
-
 extras_require = {
     "debug": [
         "wdb",
@@ -33,7 +29,9 @@ extras_require = {
         "Sphinx>=1.5.1",
         "sphinx-rtd-theme>=0.1.9",
     ],
-    "tests": tests_require,
+    "tests": [
+        "pytest-reana>=0.95.0a2,<0.96.0",
+    ],
     # Using older jq on amd64 due to https://github.com/reanahub/reana-demo-bsm-search/issues/21
     "jq": [
         "jq==0.1.7; platform_machine == 'x86_64'",
@@ -97,7 +95,6 @@ setup(
     },
     python_requires=">=3.8",
     extras_require=extras_require,
-    tests_require=tests_require,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
